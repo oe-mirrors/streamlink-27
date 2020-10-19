@@ -1,5 +1,16 @@
 # Changelog
 
+## streamlink 1.27.0.0 (2020-10-18)
+
+This is the first Python 2.7 compatibel release created from the streamlink/streamlink base version 1.7.0
+
+- renamed streamlink to streamlink-27
+- add wetter plugin
+- add attheshore plugin
+- add ozolio plugin
+- add cli-main-update-1
+
+
 ## streamlink 1.7.0 (2020-10-18)
 
 Release highlights:
