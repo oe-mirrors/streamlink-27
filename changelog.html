@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Changelog &mdash; Streamlink 1.27.0.0 documentation</title>
+  <title>Changelog &mdash; Streamlink-27 1.27.0.0 documentation</title>
   
 
   
@@ -28,7 +28,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Streamlink 1.27.0.0 documentation" href="index.html"/>
+    <link rel="top" title="Streamlink-27 1.27.0.0 documentation" href="index.html"/>
         <link rel="next" title="Donating" href="donate.html"/>
         <link rel="prev" title="API Reference" href="api.html"/> 
 
@@ -44,7 +44,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-header">
-        <a href="index.html"> Streamlink</a>
+        <a href="index.html"> Streamlink-27</a>
         
         <div class="tablet-hide">
           <small>Command-line utility that extracts streams from various services and pipes them into a video player of choice.</small>
@@ -197,7 +197,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Streamlink</a>
+        <a href="index.html">Streamlink-27</a>
       </nav>
 
 
@@ -230,6 +230,57 @@
 <li>added ozolio plugin</li>
 <li>added cli-main-update-1</li>
 </ul>
+<div class="highlight-text"><div class="highlight"><pre><span></span>Billy2011 &lt;kschmidt2007@googlemail.com&gt; (25):
+      cli.main: improvements
+      release-27 mods
+      release: 1.27.0.0
+      plugins.youtube: fix live playback
+      check for valid canonical URL
+      remove User-Agent
+      replace self.logger calls in plugins/updates
+      chore: remove deprecated CLI arguments
+      docs changes
+      update workflow
+      update github.io url&#39;s
+      Update deploy-docs.sh
+      update cli.main
+      plugins.skai: plugin removal
+      update import order
+      plugins.trt/trtspor: remove plugins
+      cli: optional player-args input variable
+      cli: add support for stream manifest URL output
+      plugin.api.useragents: update User-Agent and removed FIREFOX User-Agent imports
+      Create .travis.yml
+      Create deploy_key_doctr.enc
+      plugins.bfmtv: fix ID &amp; embed re, use Dailymotion
+      plugins.abweb: fixed login issues
+      update docs
+      plugins.cdnbg: simplify and fix iframes without schema
+
+Ian Cameron &lt;1661072+mkbloke@users.noreply.github.com&gt; (3):
+      plugins.kingkong: plugin removal
+      plugins.cnews: fix video ID search, add schema
+      plugins.ellobo: plugin removal
+
+Martin Buck &lt;mb-tmp-tvguho.pbz@gromit.dyndns.org&gt; (1):
+      plugins.zdf_mediathek: also support 3sat mediathek
+
+Sean Greenslade &lt;sean@seangreenslade.com&gt; (1):
+      plugins.picarto: explicitly detect and fail on private streams
+
+Seonjae Hyeon &lt;hsj106@mju.ac.kr&gt; (1):
+      plugins.vlive: fix URL regex and plugin (#3315)
+
+back-to &lt;backto@protonmail.ch&gt; (1):
+      plugin.api.useragents: update User-Agent
+
+bastimeyer &lt;mail@bastimeyer.de&gt; (4):
+      chore: remove old LIVESTREAMER_VERSION constant
+      ci.github: run lint step before test step
+      flake8: add import-order linting config
+      plugins.twitch: player_type access token parameter
+</pre></div>
+</div>
 </div>
 <div class="section" id="streamlink-1-7-0-2020-10-18">
 <h2>streamlink 1.7.0 (2020-10-18)<a class="headerlink" href="#streamlink-1-7-0-2020-10-18" title="Permalink to this headline">¶</a></h2>
