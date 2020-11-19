@@ -4,19 +4,18 @@ import pkgutil
 import sys
 import traceback
 import warnings
+from collections import OrderedDict
 
 import requests
 
-from collections import OrderedDict
-
-from streamlink.logger import StreamlinkLogger, Logger
-from streamlink.utils import update_scheme, memoize
+from streamlink import __version__, plugins
+from streamlink.compat import is_win32
+from streamlink.exceptions import NoPluginError, PluginError
+from streamlink.logger import Logger, StreamlinkLogger
+from streamlink.options import Options
+from streamlink.plugin import api
+from streamlink.utils import memoize, update_scheme
 from streamlink.utils.l10n import Localization
-from . import plugins, __version__
-from .compat import is_win32
-from .exceptions import NoPluginError, PluginError
-from .options import Options
-from .plugin import api
 
 # Ensure that the Logger class returned is Streamslink's for using the API (for backwards compatibility)
 logging.setLoggerClass(StreamlinkLogger)
@@ -89,6 +88,7 @@ class Streamlink(object):
             "ffmpeg-ffmpeg": None,
             "ffmpeg-video-transcode": "copy",
             "ffmpeg-audio-transcode": "copy",
+            "mux-subtitles": False,
             "locale": None,
             "user-input-requester": None
         })
@@ -228,6 +228,9 @@ class Streamlink(object):
         ffmpeg-audio-transcode   (str) The codec to use if transcoding
                                  audio when muxing with ffmpeg
                                  e.g. ``aac``
+
+        mux-subtitles            (bool) Mux available subtitles into the
+                                 output stream.
 
         stream-segment-attempts  (int) How many attempts should be done
                                  to download each segment, default: ``3``.

@@ -1,6 +1,3 @@
-.. _plugin_matrix:
-
-
 Plugins
 =======
 
@@ -78,13 +75,12 @@ dommune                 dommune.com          Yes   --
 drdk                    dr.dk                Yes   No    Streams may be geo-restricted to Denmark.
 earthcam                earthcam.com         Yes   Yes   Only works for the cams hosted on EarthCam.
 egame                   egame.qq.com         Yes   No
-ellobo                  ellobo106.com        Yes   -
 eltrecetv               eltrecetv.com.ar     Yes   Yes   Streams may be geo-restricted to Argentina.
 euronews                euronews.com         Yes   No
 facebook                facebook.com         Yes   Yes
 filmon                  filmon.com           Yes   Yes   Only SD quality streams.
 foxtr                   fox.com.tr           Yes   No
-funimationnow           - funimation.com     --    Yes   :ref:`Requires session cookies <cli-funimationnow>`
+funimationnow           - funimation.com     --    Yes   :ref:`Requires session cookies <cli:Authenticating with FunimationNow>`
                         - funimationnow.uk
 galatasaraytv           galatasaray.com      Yes   No
 gardenersworld          gardenersworld.com   --    Yes
@@ -99,11 +95,10 @@ hitbox                  - hitbox.tv          Yes   Yes
 huajiao                 huajiao.com          Yes   No
 huomao                  - huomao.com         Yes   Yes
                         - huomao.tv
-huya                    huya.com             Yes   No    Temporarily only HLS streams available.
+huya                    huya.com             Yes   No
 idf1                    idf1.fr              Yes   Yes
 ine                     ine.com              ---   Yes
 invintus                player.invintus.com  Yes   Yes
-kingkong                kingkong.com.tw      Yes   --
 kugou                   fanxing.kugou.com    Yes   --
 latina                  latina.pe            Yes   No    Streams may be geo-restricted to Peru.
 linelive                live.line.me         Yes   Yes
@@ -180,7 +175,6 @@ sbscokr                 play.sbs.co.kr       Yes   No    Streams may be geo-rest
 schoolism               schoolism.com        --    Yes   Requires a login and a subscription.
 senategov               senate.gov           --    Yes   Supports hearing streams.
 showroom                showroom-live.com    Yes   No
-skai                    skai.gr              Yes   No    Only embedded youtube live streams are supported
 sportal                 sportal.bg           Yes   No
 sportschau              sportschau.de        Yes   No
 ssh101                  ssh101.com           Yes   No
@@ -209,8 +203,6 @@ tga                     - star.plu.cn        Yes   No
 theplatform             player.thepl... [7]_ No    Yes
 tigerdile               tigerdile.com        Yes   --
 tlctr                   tlctv.com.tr         Yes   No
-trt                     trt.net.tr           Yes   No    Some streams may be geo-restricted to Turkey.
-trtspor                 trtspor.com          Yes   No    Some streams are geo-restricted to Turkey.
 turkuvaz                - atv.com.tr         Yes   No    Streams may be geo-restricted.
                         - a2tv.com.tr
                         - ahaber.com.tr

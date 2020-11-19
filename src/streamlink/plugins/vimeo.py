@@ -2,7 +2,7 @@ import logging
 import re
 
 from streamlink.compat import html_unescape, urlparse
-from streamlink.plugin import Plugin, PluginArguments, PluginArgument
+from streamlink.plugin import Plugin, PluginArgument, PluginArguments
 from streamlink.plugin.api import validate
 from streamlink.stream import DASHStream, HLSStream, HTTPStream
 from streamlink.stream.ffmpegmux import MuxedStream
@@ -50,11 +50,7 @@ class Vimeo(Plugin):
     )
 
     arguments = PluginArguments(
-        PluginArgument(
-            "mux-subtitles",
-            action="store_true",
-            help="Automatically mux available subtitles in to the output stream.",
-        )
+        PluginArgument("mux-subtitles", is_global=True)
     )
 
     @classmethod

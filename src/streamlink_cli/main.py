@@ -3,38 +3,34 @@ import errno
 import logging
 import os
 import platform
-from collections import OrderedDict
-from gettext import gettext
-
-import requests
-import sys
 import signal
-
+import sys
+from collections import OrderedDict
 from contextlib import closing
 from distutils.version import StrictVersion
 from functools import partial
+from gettext import gettext
 from itertools import chain
-from socks import __version__ as socks_version
 from time import sleep
+
+import requests
+from socks import __version__ as socks_version
 from websocket import __version__ as websocket_version
 
-from streamlink import __version__ as streamlink_version
-from streamlink import (Streamlink, StreamError, PluginError,
-                        NoPluginError)
+import streamlink.logger as logger
+from streamlink import NoPluginError, PluginError, StreamError, Streamlink, __version__ as streamlink_version
 from streamlink.cache import Cache
 from streamlink.exceptions import FatalPluginError
-from streamlink.stream import StreamProcess
 from streamlink.plugin import PluginOptions
+from streamlink.stream import StreamProcess
 from streamlink.utils import LazyFormatter
-
-import streamlink.logger as logger
-from .argparser import build_parser
-from .compat import stdout, is_win32
-from streamlink.utils.encoding import maybe_decode, get_filesystem_encoding
-from .console import ConsoleOutput, ConsoleUserInputRequester
-from .constants import CONFIG_FILES, PLUGINS_DIR, STREAM_SYNONYMS, DEFAULT_STREAM_METADATA
-from .output import FileOutput, PlayerOutput
-from .utils import NamedPipe, HTTPServer, ignored, progress, stream_to_url
+from streamlink.utils.encoding import get_filesystem_encoding, maybe_decode
+from streamlink_cli.argparser import build_parser
+from streamlink_cli.compat import is_win32, stdout
+from streamlink_cli.console import ConsoleOutput, ConsoleUserInputRequester
+from streamlink_cli.constants import CONFIG_FILES, DEFAULT_STREAM_METADATA, PLUGINS_DIR, STREAM_SYNONYMS
+from streamlink_cli.output import FileOutput, PlayerOutput
+from streamlink_cli.utils import HTTPServer, NamedPipe, ignored, progress, stream_to_url
 
 ACCEPTABLE_ERRNO = (errno.EPIPE, errno.EINVAL, errno.ECONNRESET)
 try:
@@ -618,12 +614,16 @@ def handle_url():
         else:
             console.exit("{0}.\n       Available streams: {1}",
                          err, validstreams)
+    elif console.json:
+        console.msg_json(dict(plugin=plugin.module, streams=streams))
+    elif args.stream_url:
+        try:
+            console.msg("{0}", streams[list(streams)[-1]].to_manifest_url())
+        except TypeError:
+            console.exit("The stream specified cannot be translated to a URL")
     else:
-        if console.json:
-            console.msg_json(dict(streams=streams, plugin=plugin.module))
-        else:
-            validstreams = format_valid_streams(plugin, streams)
-            console.msg("Available streams: {0}", validstreams)
+        validstreams = format_valid_streams(plugin, streams)
+        console.msg("Available streams: {0}", validstreams)
 
 
 def print_plugins():
@@ -741,15 +741,6 @@ def setup_http_session():
     if args.http_timeout:
         streamlink.set_option("http-timeout", args.http_timeout)
 
-    if args.http_cookies:
-        streamlink.set_option("http-cookies", args.http_cookies)
-
-    if args.http_headers:
-        streamlink.set_option("http-headers", args.http_headers)
-
-    if args.http_query_params:
-        streamlink.set_option("http-query-params", args.http_query_params)
-
 
 def setup_plugins(extra_plugin_dir=None):
     """Loads any additional plugins."""
@@ -864,6 +855,9 @@ def setup_options():
     if args.ffmpeg_audio_transcode:
         streamlink.set_option("ffmpeg-audio-transcode", args.ffmpeg_audio_transcode)
 
+    if args.mux_subtitles:
+        streamlink.set_option("mux-subtitles", args.mux_subtitles)
+
     streamlink.set_option("subprocess-errorlog", args.subprocess_errorlog)
     streamlink.set_option("subprocess-errorlog-path", args.subprocess_errorlog_path)
     streamlink.set_option("locale", args.locale)
@@ -875,9 +869,23 @@ def setup_plugin_args(session, parser):
     plugin_args = parser.add_argument_group("Plugin options")
     for pname, plugin in session.plugins.items():
         defaults = {}
+
         for parg in plugin.arguments:
-            plugin_args.add_argument(parg.argument_name(pname), **parg.options)
-            defaults[parg.dest] = parg.default
+            if not parg.is_global:
+                plugin_args.add_argument(parg.argument_name(pname), **parg.options)
+                defaults[parg.dest] = parg.default
+            else:
+                pargdest = parg.dest
+                for action in parser._actions:
+                    # find matching global argument
+                    if pargdest != action.dest:
+                        continue
+                    defaults[pargdest] = action.default
+
+                    # add plugin to global argument
+                    plugins = getattr(action, "plugins", [])
+                    plugins.append(pname)
+                    setattr(action, "plugins", plugins)
 
         plugin.options = PluginOptions(defaults)
 
@@ -886,21 +894,26 @@ def setup_plugin_options(session, plugin):
     """Sets Streamlink plugin options."""
     pname = plugin.module
     required = OrderedDict({})
+
     for parg in plugin.arguments:
-        if parg.options.get("help") != argparse.SUPPRESS:
+        if parg.options.get("help") == argparse.SUPPRESS:
+            continue
+
+        value = getattr(args, parg.dest if parg.is_global else parg.namespace_dest(pname))
+        session.set_plugin_option(pname, parg.dest, value)
+
+        if not parg.is_global:
             if parg.required:
                 required[parg.name] = parg
-            value = getattr(args, parg.namespace_dest(pname))
-            session.set_plugin_option(pname, parg.dest, value)
             # if the value is set, check to see if any of the required arguments are not set
             if parg.required or value:
                 try:
                     for rparg in plugin.arguments.requires(parg.name):
                         required[rparg.name] = rparg
                 except RuntimeError:
-                    log.error("{0} plugin has a configuration error and the arguments "
-                              "cannot be parsed".format(pname))
+                    log.error("{0} plugin has a configuration error and the arguments cannot be parsed".format(pname))
                     break
+
     if required:
         for req in required.values():
             if not session.get_plugin_option(pname, req.dest):
@@ -941,11 +954,11 @@ def check_version(force=False):
     cache = Cache(filename="cli.json")
     latest_version = cache.get("latest_version")
 
-    if force or not latest_version:
-        res = requests.get("https://pypi.python.org/pypi/streamlink/json")
-        data = res.json()
-        latest_version = data.get("info").get("version")
-        cache.set("latest_version", latest_version, (60 * 60 * 24))
+#    if force or not latest_version:
+#        res = requests.get("https://pypi.python.org/pypi/streamlink/json")
+#        data = res.json()
+#        latest_version = data.get("info").get("version")
+#        cache.set("latest_version", latest_version, (60 * 60 * 24))
 
     version_info_printed = cache.get("version_info_printed")
     if not force and version_info_printed:
@@ -1010,7 +1023,7 @@ def main():
     check_root()
     log_current_versions()
 
-    if args.version_check or (not args.no_version_check and args.auto_version_check):
+    if args.version_check or args.auto_version_check:
         with ignored(Exception):
             check_version(force=args.version_check)
 
@@ -1053,7 +1066,7 @@ def main():
         usage = parser.format_usage()
         msg = (
             "{usage}\nUse -h/--help to see the available options or "
-            "read the manual at https://streamlink.github.io"
+            "read the manual at https://Billy2011.github.io/streamlink-27"
         ).format(usage=usage)
         console.msg(msg)
 

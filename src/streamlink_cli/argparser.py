@@ -4,15 +4,15 @@ import re
 from string import printable
 from textwrap import dedent
 
-from streamlink import logger
+from streamlink import __version__ as streamlink_version, logger
 from streamlink.utils.args import (
     boolean, comma_list, comma_list_filter, filesize, keyvalue, num
 )
 from streamlink.utils.times import hours_minutes_seconds
-from .constants import (
-    LIVESTREAMER_VERSION, STREAM_PASSTHROUGH, DEFAULT_PLAYER_ARGUMENTS, DEFAULT_STREAM_METADATA, SUPPORTED_PLAYERS
+from streamlink_cli.constants import (
+    DEFAULT_STREAM_METADATA, PLAYER_ARGS_INPUT_DEFAULT, PLAYER_ARGS_INPUT_FALLBACK, STREAM_PASSTHROUGH, SUPPORTED_PLAYERS
 )
-from .utils import find_default_player
+from streamlink_cli.utils import find_default_player
 
 _printable_re = re.compile(r"[{0}]".format(printable))
 _option_re = re.compile(r"""
@@ -110,7 +110,7 @@ def build_parser():
         """),
         epilog=dedent("""
         For more in-depth documentation see:
-          https://streamlink.github.io
+          https://Billy2011.github.io/streamlink-27
 
         Please report broken plugins or bugs to the issue tracker on Github:
           https://github.com/streamlink/streamlink/issues
@@ -162,7 +162,7 @@ def build_parser():
     general.add_argument(
         "-V", "--version",
         action="version",
-        version="%(prog)s {0}".format(LIVESTREAMER_VERSION),
+        version="%(prog)s {0}".format(streamlink_version),
         help="""
         Show version number and exit.
         """
@@ -275,10 +275,6 @@ def build_parser():
         Default is system locale.
         """
     )
-    general.add_argument(
-        "--twitch-oauth-authenticate",
-        help=argparse.SUPPRESS
-    )
 
     player = parser.add_argument_group("Player options")
     player.add_argument(
@@ -316,33 +312,36 @@ def build_parser():
     player.add_argument(
         "-a", "--player-args",
         metavar="ARGUMENTS",
-        default=DEFAULT_PLAYER_ARGUMENTS,
+        default="",
         help="""
         This option allows you to customize the default arguments which are put
         together with the value of --player to create a command to execute.
-        Unlike the --player parameter, custom player arguments will not be logged.
 
-        This value can contain formatting variables surrounded by curly braces,
+        It's usually enough to only use --player instead of this unless you need
+        to add arguments after the player's input argument or if you don't want
+        any of the player arguments to be logged.
+
+        The value can contain formatting variables surrounded by curly braces,
         {{ and }}. If you need to include a brace character, it can be escaped
         by doubling, e.g. {{{{ and }}}}.
 
         Formatting variables available:
 
-        {{filename}}
-            This is the filename that the player will use. It's usually "-"
-            (stdin), but can also be a URL or a file depending on the options
-            used.
+        {{{0}}}
+            This is the input that the player will use. For standard input (stdin),
+            it is ``-``, but it can also be a URL, depending on the options used.
 
-        It's usually enough to use --player instead of this unless you need to
-        add arguments after the filename.
-
-        Default is "{0}".
+        {{{1}}}
+            The old fallback variable name with the same functionality.
 
         Example:
 
-          %(prog)s -p vlc -a "--play-and-exit {{filename}}" <url> [stream]
+          %(prog)s -p vlc -a "--play-and-exit {{{0}}}" <url> [stream]
 
-        """.format(DEFAULT_PLAYER_ARGUMENTS)
+        Note: When neither of the variables are found, ``{{{0}}}``
+        will be appended to the whole parameter value, to ensure that the player
+        always receives an input argument.
+        """.format(PLAYER_ARGS_INPUT_DEFAULT, PLAYER_ARGS_INPUT_FALLBACK)
     )
     player.add_argument(
         "-v", "--verbose-player",
@@ -468,7 +467,7 @@ def build_parser():
             inserted inside your --title string.
 
             A full list of the format codes mpv uses is available here:
-            https://mpv.io/manual/stable/#property-expansion
+            https://mpv.io/manual/stable/#property-list
 
         Formatting variables available to use in --title:
 
@@ -1098,6 +1097,15 @@ def build_parser():
         Example: "aac"
         """
     )
+    transport.add_argument(
+        "--mux-subtitles",
+        action="store_true",
+        help="""
+        Automatically mux available subtitles into the output stream.
+
+        Needs to be supported by the used plugin.
+        """
+    )
 
     http = parser.add_argument_group("HTTP options")
     http.add_argument(
@@ -1209,27 +1217,6 @@ def build_parser():
         """
     )
 
-    # Deprecated options
-    http.add_argument(
-        "--http-cookies",
-        metavar="COOKIES",
-        help=argparse.SUPPRESS
-    )
-    http.add_argument(
-        "--http-headers",
-        metavar="HEADERS",
-        help=argparse.SUPPRESS
-    )
-    http.add_argument(
-        "--http-query-params",
-        metavar="PARAMS",
-        help=argparse.SUPPRESS
-    )
-    general.add_argument(
-        "--no-version-check",
-        action="store_true",
-        help=argparse.SUPPRESS
-    )
     return parser
 
 

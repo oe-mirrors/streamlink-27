@@ -5,11 +5,11 @@ import logging
 import re
 
 from streamlink import PluginError
-from streamlink.plugin import Plugin, PluginArguments, PluginArgument
+from streamlink.compat import parse_qsl, urlparse
+from streamlink.plugin import Plugin, PluginArgument, PluginArguments
 from streamlink.plugin.api import useragents
 from streamlink.stream import HLSStream
 from streamlink.utils import memoize
-from streamlink.compat import urlparse, parse_qsl
 from streamlink.utils.times import seconds_to_hhmmss
 
 log = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ class WWENetwork(Plugin):
         return data
 
     def login(self, email, password):
-        self.logger.debug("Attempting login as {0}", email)
+        log.debug("Attempting login as {0}".format(email))
         # sets some required cookies to login
         data = self.request('POST', self.login_url,
                             data=json.dumps({"id": email, "secret": password}),
@@ -152,7 +152,7 @@ class WWENetwork(Plugin):
         content_id = self._get_video_id()
 
         if content_id:
-            self.logger.debug("Found content ID: {0}", content_id)
+            log.debug("Found content ID: {0}".format(content_id))
             info = self._get_media_info(content_id)
             if info.get("hlsUrl"):
                 for s in HLSStream.parse_variant_playlist(

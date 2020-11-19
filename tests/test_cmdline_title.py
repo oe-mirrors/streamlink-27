@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from streamlink.compat import is_win32, is_py3, is_py2
+from streamlink.compat import is_py2, is_py3, is_win32
 from streamlink.utils import get_filesystem_encoding
 from tests.test_cmdline import CommandLineTestCase
 
@@ -87,7 +87,7 @@ class TestCommandLineWithTitleWindows(CommandLineTestCase):
             ["streamlink", "-p", "\"c:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe\"",
              "--title", "{author}", "http://test.se/stream", "hls", "--player-passthrough", "hls"],
             "\"c:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe\" \"http://test.se/playlist.m3u8\\"
-            + u"Tѥst Āuƭhǿr".encode(get_filesystem_encoding())
+            + "Tѥst Āuƭhǿr"
             + "\"",
             passthrough=True
         )

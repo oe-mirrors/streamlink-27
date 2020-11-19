@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import argparse
 import logging
 import re
 
 from streamlink.exceptions import FatalPluginError, NoStreamsError, PluginError
-from streamlink.plugin import Plugin, PluginArguments, PluginArgument
-from streamlink.plugin.api import useragents, validate
+from streamlink.plugin import Plugin, PluginArgument, PluginArguments
+from streamlink.plugin.api import validate
 from streamlink.stream import HLSStream
 from streamlink.utils.encoding import maybe_decode
 
@@ -58,8 +57,6 @@ class Pixiv(Plugin):
     login_url_post = "https://accounts.pixiv.net/api/login"
 
     arguments = PluginArguments(
-        PluginArgument("username", help=argparse.SUPPRESS),
-        PluginArgument("password", help=argparse.SUPPRESS),
         PluginArgument(
             "sessionid",
             requires=["devicetoken"],
@@ -98,10 +95,7 @@ class Pixiv(Plugin):
         super(Pixiv, self).__init__(url)
         self._authed = (self.session.http.cookies.get("PHPSESSID")
                         and self.session.http.cookies.get("device_token"))
-        self.session.http.headers.update({
-            "User-Agent": useragents.FIREFOX,
-            "Referer": self.url
-        })
+        self.session.http.headers.update({"Referer": self.url})
 
     @classmethod
     def can_handle_url(cls, url):

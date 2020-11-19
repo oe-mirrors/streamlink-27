@@ -18,7 +18,16 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'ext_argparse', 'ext_github', 'ext_releaseref', 'recommonmark']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosectionlabel',
+    'ext_argparse',
+    'ext_github',
+    'ext_releaseref',
+    'recommonmark'
+]
+
+autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -31,7 +40,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Streamlink'
-copyright = '2020, Streamlink'
+copyright = '2020, Streamlink, Billy2011'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -77,7 +86,7 @@ exclude_patterns = ['_build', '_applications.rst']
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
-github_project = 'streamlink/streamlink'
+github_project = 'Billy2011/streamlink-27'
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -90,8 +99,8 @@ html_theme_options = {
         "Command-line utility that extracts streams from various services "
         "and pipes them into a video player of choice."
     ),
-    "github_user": "streamlink",
-    "github_repo": "streamlink",
+    "github_user": "Billy2011",
+    "github_repo": "streamlink-27",
     "sticky_navigation": True
 }
 
@@ -102,7 +111,7 @@ html_theme_options = {
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = { "github_fork": "streamlink/streamlink" }
+# html_theme_options = { "github_fork": "Billy2011/streamlink-27" }
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
