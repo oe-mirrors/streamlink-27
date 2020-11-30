@@ -23,14 +23,14 @@ from streamlink.cache import Cache
 from streamlink.exceptions import FatalPluginError
 from streamlink.plugin import PluginOptions
 from streamlink.stream import StreamProcess
-from streamlink.utils import LazyFormatter
+from streamlink.utils import LazyFormatter, NamedPipe
 from streamlink.utils.encoding import get_filesystem_encoding, maybe_decode
 from streamlink_cli.argparser import build_parser
 from streamlink_cli.compat import is_win32, stdout
 from streamlink_cli.console import ConsoleOutput, ConsoleUserInputRequester
 from streamlink_cli.constants import CONFIG_FILES, DEFAULT_STREAM_METADATA, PLUGINS_DIR, STREAM_SYNONYMS
 from streamlink_cli.output import FileOutput, PlayerOutput
-from streamlink_cli.utils import HTTPServer, NamedPipe, ignored, progress, stream_to_url
+from streamlink_cli.utils import HTTPServer, ignored, progress, stream_to_url
 
 ACCEPTABLE_ERRNO = (errno.EPIPE, errno.EINVAL, errno.ECONNRESET)
 try:
@@ -828,6 +828,8 @@ def setup_options():
 
     if args.rtmp_rtmpdump:
         streamlink.set_option("rtmp-rtmpdump", args.rtmp_rtmpdump)
+    elif args.rtmpdump:
+        streamlink.set_option("rtmp-rtmpdump", args.rtmpdump)
 
     if args.rtmp_timeout:
         streamlink.set_option("rtmp-timeout", args.rtmp_timeout)
@@ -850,10 +852,14 @@ def setup_options():
         streamlink.set_option("ffmpeg-verbose", args.ffmpeg_verbose)
     if args.ffmpeg_verbose_path:
         streamlink.set_option("ffmpeg-verbose-path", args.ffmpeg_verbose_path)
+    if args.ffmpeg_fout:
+        streamlink.set_option("ffmpeg-fout", args.ffmpeg_fout)
     if args.ffmpeg_video_transcode:
         streamlink.set_option("ffmpeg-video-transcode", args.ffmpeg_video_transcode)
     if args.ffmpeg_audio_transcode:
         streamlink.set_option("ffmpeg-audio-transcode", args.ffmpeg_audio_transcode)
+    if args.ffmpeg_no_start_at_zero:
+        streamlink.set_option("ffmpeg-start-at-zero", False)
 
     if args.mux_subtitles:
         streamlink.set_option("mux-subtitles", args.mux_subtitles)
