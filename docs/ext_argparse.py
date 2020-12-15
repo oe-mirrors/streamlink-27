@@ -45,6 +45,8 @@ class ArgparseDirective(Directive):
         "attr": unchanged,
     }
 
+    _headlines = ["^", "~"]
+
     def process_help(self, help):
         # Dedent the help to make sure we are always dealing with
         # non-indented text.
@@ -108,7 +110,9 @@ class ArgparseDirective(Directive):
             else:
                 options += action.option_strings
 
-            yield ".. option:: {0}".format(', '.join(options))
+            directive = ".. option:: "
+            options = "\n{0}".format(' ' * len(directive)).join(options)
+            yield "{0}{1}".format(directive, options)
             yield ""
             for line in self.process_help(action.help).split("\n"):
                 yield line
@@ -117,17 +121,21 @@ class ArgparseDirective(Directive):
                 yield "    **Supported plugins:** {0}".format(', '.join(action.plugins))
                 yield ""
 
-    def generate_parser_rst(self, parser):
+    def generate_parser_rst(self, parser, depth=0):
+        if depth >= len(self._headlines):
+            return
         for group in parser._action_groups:
             # Exclude empty groups
-            if len(group._group_actions) == 0:
+            if not group._group_actions and not group._action_groups:
                 continue
             title = group.title
             yield ""
             yield title
-            yield "^" * len(title)
-            for line in self.generate_group_rst(group):
-                yield line
+            yield self._headlines[depth] * len(title)
+            yield from self.generate_group_rst(group)
+            if group._action_groups:
+                yield ""
+                yield from self.generate_parser_rst(group, depth + 1)
 
     def run(self):
         module = self.options.get("module")
