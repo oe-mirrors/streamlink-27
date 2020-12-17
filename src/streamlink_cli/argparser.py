@@ -619,6 +619,13 @@ def build_parser():
         """
     )
     stream.add_argument(
+        "--stream-url",
+        action="store_true",
+        help="""
+        If possible, translate the resolved stream to a URL and print it.
+        """
+    )
+    stream.add_argument(
         "--retry-streams",
         metavar="DELAY",
         type=num(float, min=0),
@@ -1042,13 +1049,6 @@ def build_parser():
         Default is 60.0.
         """)
     transport.add_argument(
-        "--stream-url",
-        action="store_true",
-        help="""
-        If possible, translate the stream to a URL and print it.
-        """
-    )
-    transport.add_argument(
         "--subprocess-cmdline",
         action="store_true",
         help="""
@@ -1137,11 +1137,18 @@ def build_parser():
         """
     )
     transport.add_argument(
-        "--ffmpeg-no-start-at-zero",
+        "--ffmpeg-copyts",
         action="store_true",
         help="""
-        Disables the -start_at_zero ffmpeg option
-        when using copyts.
+        Forces the -copyts ffmpeg option and does not remove
+        the initial start time offset value.
+        """
+    )
+    transport.add_argument(
+        "--ffmpeg-start-at-zero",
+        action="store_true",
+        help="""
+        Enable the -start_at_zero ffmpeg option when using copyts.
         """
     )
     transport.add_argument(
