@@ -1,13 +1,13 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Streamlink Applications" href="applications.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Developing" href="developing.html" /><link rel="prev" title="Players" href="players.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2020.12.09.beta21"/>
-        <title>Third Party Applications - Streamlink 1.27.1.0 documentation</title>
-      <link rel="stylesheet" href="static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
-    <link rel="stylesheet" href="static/pygments.css">
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="static/pygments_dark.css">
+        <title>Common issues - Streamlink 1.27.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
 
 
@@ -36,18 +36,18 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="static/pygments_dark.css" />
-    <link rel="stylesheet" type="text/css" href="static/styles/custom.css" />
+</style><link id="pygments_dark_css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css" href="_static/pygments_dark.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/custom.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/fontawesome.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/solid.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/brands.min.css" />
-    <link rel="stylesheet" href="static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
-    <script id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
-    <script defer src="static/jquery.js"></script>
-    <script defer src="static/underscore.js"></script>
-    <script defer src="static/doctools.js"></script>
-    <script defer src="static/language_data.js"></script>
-    <script defer src="static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script defer src="_static/jquery.js"></script>
+    <script defer src="_static/underscore.js"></script>
+    <script defer src="_static/doctools.js"></script>
+    <script defer src="_static/language_data.js"></script>
+    <script defer src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -108,7 +108,7 @@
       
       <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand centered" href="index.html">
   <div class="sidebar-logo-container">
-    <img class="sidebar-logo" src="static/icon.svg" alt="Streamlink"/>
+    <img class="sidebar-logo" src="_static/icon.svg" alt="Streamlink"/>
   </div>
   <p class="sidebar-brand-text">Streamlink</p>
   <p class="sidebar-brand-oneliner">A command-line utility that extracts streams from various services and pipes them into a video player of choice.</p>
@@ -116,8 +116,8 @@
 <div class="sidebar-versions centered" role="note" aria-label="versions">
   <pre class="sidebar-versions-current">1.27.1.0</pre>
   <dl class="sidebar-versions-others">
-    <dd><a href="/thirdparty.html" class="version-current">Stable</a></dd>
-    <dd><a href="/latest/thirdparty.html" class="">Latest</a></dd>
+    <dd><a href="/issues.html" class="version-current">Stable</a></dd>
+    <dd><a href="/latest/issues.html" class="">Latest</a></dd>
   </dl>
 </div><form class="sidebar-search-container" method="get" action="search.html">
   <input class="sidebar-search" placeholder="Search" name="q">
@@ -130,14 +130,14 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plugin_matrix.html">Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="players.html">Players</a></li>
-<li class="toctree-l1"><a class="reference internal" href="issues.html">Common issues</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Common issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developing.html">Developing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_guide.html">API Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="donate.html">Donating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="applications.html">Streamlink Applications</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Third Party Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thirdparty.html">Third Party Applications</a></li>
 </ul>
 
 </div><div class="github-buttons centered">
@@ -163,92 +163,84 @@
         </label>
         
   
-  <style>
-    .rst-content table.field-list td {
-        padding-top: 8px;
-    }
-    i.fab.fa-fw {
-        font-size: 1.333em;
-    }
-</style><div class="section" id="third-party-applications">
-<h1>Third Party Applications<a class="headerlink" href="#third-party-applications" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="liveproxy">
-<h2>LiveProxy<a class="headerlink" href="#liveproxy" title="Permalink to this headline">¶</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Description</dt>
-<dd class="field-odd"><p>Local proxy server between Streamlink and an URL</p>
-</dd>
-<dt class="field-even">OS</dt>
-<dd class="field-even"><p><i class="fab fa-fw fa-windows"></i> <i class="fab fa-fw fa-apple"></i> <i class="fab fa-fw fa-linux"></i></p>
-</dd>
-<dt class="field-odd">Author</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://github.com/back-to">back-to</a></p>
-</dd>
-<dt class="field-even">Website</dt>
-<dd class="field-even"><p><a class="reference external" href="https://liveproxy.github.io">https://liveproxy.github.io</a></p>
-</dd>
-<dt class="field-odd">Source code</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://github.com/back-to/liveproxy">https://github.com/back-to/liveproxy</a></p>
-</dd>
-<dt class="field-even">Info</dt>
-<dd class="field-even"><p>LiveProxy allows Streamlink to be easy accessible from <strong>m3u</strong> playlists, <br/>
-it is also available for <strong>Kodi Leia</strong> and <strong>Enigma2</strong> devices. <br/>
-A detailed guide can be found on the website.</p>
-</dd>
-</dl>
+  <div class="section" id="common-issues">
+<h1>Common issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="streams-are-buffering-lagging">
+<h2>Streams are buffering/lagging<a class="headerlink" href="#streams-are-buffering-lagging" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enable-caching-in-your-player">
+<h3>Enable caching in your player<a class="headerlink" href="#enable-caching-in-your-player" title="Permalink to this headline">¶</a></h3>
+<p>By default most players do not cache the data they receive from Streamlink.
+Caching can reduce the amount of buffering you run into because the player will
+have some breathing room between receiving the data and playing it.</p>
+<div class="table-wrapper"><table class="docutils align-default">
+<colgroup>
+<col style="width: 15%"/>
+<col style="width: 36%"/>
+<col style="width: 49%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Player</p></th>
+<th class="head"><p>Parameter</p></th>
+<th class="head"><p>Note</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MPC-HC</p></td>
+<td><p>--</p></td>
+<td><p>Currently no way of configuring the cache</p></td>
+</tr>
+<tr class="row-odd"><td><p>MPlayer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-cache</span> <span class="pre">&lt;kbytes&gt;</span></code></p></td>
+<td><p>Between 1024 and 8192 is recommended</p></td>
+</tr>
+<tr class="row-even"><td><p>mpv</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--cache=yes</span>
+<span class="pre">--demuxer-max-bytes=&lt;kbytes&gt;</span></code></p></td>
+<td><p>Between 1024 and 8192 is recommended</p></td>
+</tr>
+<tr class="row-odd"><td><p>VLC</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--file-caching</span> <span class="pre">&lt;ms&gt;</span>
+<span class="pre">--network-caching</span> <span class="pre">&lt;ms&gt;</span></code></p></td>
+<td><p>Between 1000 and 10000 is recommended</p></td>
+</tr>
+</tbody>
+</table></div>
+<p>Use the <a class="reference internal" href="cli.html#cmdoption-player-args"><code class="xref std std-option docutils literal notranslate"><span class="pre">--player-args</span></code></a> or <a class="reference internal" href="cli.html#cmdoption-player"><code class="xref std std-option docutils literal notranslate"><span class="pre">--player</span></code></a> option to pass these options to your player.</p>
 </div>
-<div class="section" id="wtwitch">
-<h2>Wtwitch<a class="headerlink" href="#wtwitch" title="Permalink to this headline">¶</a></h2>
-<img alt="Wtwitch screenshot of checking subscriptions" class="align-center" src="https://i.imgur.com/oaxH3ss.jpg"/>
-<dl class="field-list simple">
-<dt class="field-odd">Description</dt>
-<dd class="field-odd"><p>Browse Twitch streams; subscribe to streamers locally without an account</p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>TUI (terminal user interface)</p>
-</dd>
-<dt class="field-odd">OS</dt>
-<dd class="field-odd"><p><i class="fab fa-fw fa-linux"></i></p>
-</dd>
-<dt class="field-even">Author</dt>
-<dd class="field-even"><p><a class="reference external" href="https://git.sr.ht/~krathalan/">krathalan</a></p>
-</dd>
-<dt class="field-odd">Website</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://git.sr.ht/~krathalan/wtwitch">https://git.sr.ht/~krathalan/wtwitch</a></p>
-</dd>
-<dt class="field-even">Info</dt>
-<dd class="field-even"><p>wtwitch is a Bash program that lets you browse the top games on Twitch, the <br/>
-top streamers for a given game, and lets you check the status of streamers you <br/>
-subscribe to. Open streams easily with settings that save your preferred quality <br/>
-and player. A man page comes with the AUR package or can be compiled manually.</p>
-</dd>
-</dl>
+<div class="section" id="multi-threaded-streaming">
+<h3>Multi-threaded streaming<a class="headerlink" href="#multi-threaded-streaming" title="Permalink to this headline">¶</a></h3>
+<p>On segmented streaming protocols (such as HLS and HDS) it's possible to use
+multiple threads to potentially increase the throughput.
+Each stream type has its own option, and these are the ones that are currently available:</p>
+<div class="table-wrapper"><table class="docutils align-default">
+<colgroup>
+<col style="width: 43%"/>
+<col style="width: 57%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Used by these plugins</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="cli.html#cmdoption-hls-segment-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hls-segment-threads</span></code></a></p></td>
+<td><p><cite>twitch</cite>, <cite>youtube</cite> and many more.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cli.html#cmdoption-hds-segment-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hds-segment-threads</span></code></a></p></td>
+<td><p><cite>dailymotion</cite> and many more.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="cli.html#cmdoption-stream-segment-threads"><code class="xref std std-option docutils literal notranslate"><span class="pre">--stream-segment-threads</span></code></a></p></td>
+<td><p><cite>ustreamtv</cite> and any other plugins implementing
+their own segmented streaming protocol.</p></td>
+</tr>
+</tbody>
+</table></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using 2 or 3 threads should be enough to see an impact on live streams,
+any more will likely not show much effect.</p>
 </div>
-<div class="section" id="obs-streamlink">
-<h2>OBS-Streamlink<a class="headerlink" href="#obs-streamlink" title="Permalink to this headline">¶</a></h2>
-<dl class="field-list simple">
-<dt class="field-odd">Description</dt>
-<dd class="field-odd"><p>OBS source plugin for embedding streams using Streamlink</p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>OBS Plugin</p>
-</dd>
-<dt class="field-odd">OS</dt>
-<dd class="field-odd"><p><i class="fab fa-fw fa-windows"></i></p>
-</dd>
-<dt class="field-even">Author</dt>
-<dd class="field-even"><p><a class="reference external" href="https://github.com/dd-center">DD Center</a></p>
-</dd>
-<dt class="field-odd">Website</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://github.com/dd-center/obs-streamlink">https://github.com/dd-center/obs-streamlink</a></p>
-</dd>
-<dt class="field-even">Info</dt>
-<dd class="field-even"><p>OBS-Streamlink is a plugin for OBS (Open Broadcaster Software) which allows
-embedding streams directly as a scene source. This is useful for broadcasters of
-multi-platform live streams and for live commentators.</p>
-</dd>
-</dl>
-<p>Help us extend this list by sending us a pull request on Github. Thanks!</p>
+</div>
 </div>
 </div>
 
@@ -257,15 +249,23 @@ multi-platform live streams and for live commentators.</p>
       <footer>
         
         <div class="related-pages">
-          
-          <a class="prev-page" href="applications.html">
+          <a class="next-page" href="developing.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Developing</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="players.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Streamlink Applications</div>
+                <div class="title">Players</div>
                 
               </div>
             </a>
@@ -294,10 +294,12 @@ multi-platform live streams and for live commentators.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Third Party Applications</a><ul>
-<li><a class="reference internal" href="#liveproxy">LiveProxy</a></li>
-<li><a class="reference internal" href="#wtwitch">Wtwitch</a></li>
-<li><a class="reference internal" href="#obs-streamlink">OBS-Streamlink</a></li>
+<li><a class="reference internal" href="#">Common issues</a><ul>
+<li><a class="reference internal" href="#streams-are-buffering-lagging">Streams are buffering/lagging</a><ul>
+<li><a class="reference internal" href="#enable-caching-in-your-player">Enable caching in your player</a></li>
+<li><a class="reference internal" href="#multi-threaded-streaming">Multi-threaded streaming</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
