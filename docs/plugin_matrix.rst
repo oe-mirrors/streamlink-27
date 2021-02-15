@@ -65,10 +65,9 @@ dogan                   - cnnturk.com        Yes   Yes
                         - dreamtv.com.tr
                         - kanald.com.tr
                         - teve2.com.tr
-dogus                   - ntvspor.net        Yes   No
+dogus                   - eurostartv.com.tr  Yes   No
                         - kralmuzik.com.tr
                         - ntv.com.tr
-                        - eurostartv.com.tr
                         - startv.com.tr
 dommune                 dommune.com          Yes   --
 drdk                    dr.dk                Yes   No    Streams may be geo-restricted to Denmark.
@@ -109,7 +108,6 @@ livestream              livestream.com       Yes   --
 lrt                     lrt.lt               Yes   No
 ltv_lsm_lv              ltv.lsm.lv           Yes   No    Streams may be geo-restricted to Latvia.
 mediaklikk              mediaklikk.hu        Yes   No    Streams may be geo-restricted to Hungary.
-mico                    micous.com           Yes   --
 mitele                  mitele.es            Yes   No    Streams may be geo-restricted to Spain.
 mjunoon                 mjunoon.tv           Yes   Yes
 mrtmk                   play.mrt.com.mk      Yes   Yes   Streams may be geo-restricted to North Macedonia.
@@ -119,6 +117,7 @@ nbcnews                 nbcnews.com          Yes   No
 nbcsports               nbcsports.com        No    Yes   Streams maybe be geo-restricted to USA. Authentication is not supported.
 nhkworld                nhk.or.jp/nhkworld   Yes   No
 nicolive                live.nicovideo.jp    Yes   Yes   Timeshift is supported. Some content may require login.
+nimotv                  nimo.tv              Yes   No
 nos                     nos.nl               Yes   Yes   Streams may be geo-restricted to Netherlands.
 nownews                 news.now.com         Yes   No
 nrk                     - tv.nrk.no          Yes   Yes   Streams may be geo-restricted to Norway.
