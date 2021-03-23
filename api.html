@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Changelog" href="changelog.html" /><link rel="prev" title="API Guide" href="api_guide.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2020.12.09.beta21"/>
-        <title>API Reference - Streamlink 1.27.1.0 documentation</title>
+        <title>API Reference - Streamlink documentation</title>
       <link rel="stylesheet" href="static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
     <link rel="stylesheet" href="static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="static/pygments_dark.css">
@@ -95,7 +95,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Streamlink 1.27.1.0 documentation</div></a>
+      <a href="index.html"><div class="brand">Streamlink  documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -114,7 +114,7 @@
   <p class="sidebar-brand-oneliner">A command-line utility that extracts streams from various services and pipes them into a video player of choice.</p>
 </a>
 <div class="sidebar-versions centered" role="note" aria-label="versions">
-  <pre class="sidebar-versions-current">1.27.1.0</pre>
+  <pre class="sidebar-versions-current"></pre>
   <dl class="sidebar-versions-others">
     <dd><a href="/api.html" class="version-current">Stable</a></dd>
     <dd><a href="/latest/api.html" class="">Latest</a></dd>
@@ -222,12 +222,6 @@ options and log settings.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="streamlink.Streamlink.logger">
-<em class="property">property </em><code class="sig-name descname">logger</code><a class="headerlink" href="#streamlink.Streamlink.logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Backwards compatible logger property
-:return: Logger instance</p>
-</dd></dl>
-<dl class="py method">
 <dt id="streamlink.Streamlink.resolve_url">
 <code class="sig-name descname">resolve_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">follow_redirect</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.resolve_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to find a plugin that can use this URL.</p>
@@ -257,28 +251,6 @@ not specified.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt id="streamlink.Streamlink.set_loglevel">
-<code class="sig-name descname">set_loglevel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.set_loglevel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the log level used by this session.</p>
-<p>Valid levels are: "none", "error", "warning", "info"
-and "debug".</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>level</strong> -- level of logging to output</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt id="streamlink.Streamlink.set_logoutput">
-<code class="sig-name descname">set_logoutput</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.set_logoutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the log output used by this session.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>output</strong> -- a file-like object with a write method</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
 <dt id="streamlink.Streamlink.set_option">
 <code class="sig-name descname">set_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.set_option" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets general options used by plugins and streams originating
@@ -298,34 +270,51 @@ from this session object.</p>
 <col style="width: 71%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p>hds-live-edge</p></td>
-<td><p>( float) Specify the time live HDS
+<tr class="row-odd"><td><p>interface</p></td>
+<td><p>(str) Set the network interface,
+default: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>ipv4</p></td>
+<td><p>(bool) Resolve address names to IPv4 only.
+This option overrides ipv6, default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>ipv6</p></td>
+<td><p>(bool) Resolve address names to IPv6 only.
+This option overrides ipv4, default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>hds-live-edge</p></td>
+<td><p>(float) Specify the time live HDS
 streams will start from the edge of
 stream, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>hds-segment-attempts</p></td>
+<tr class="row-odd"><td><p>hds-segment-attempts</p></td>
 <td><p>(int) How many attempts should be done
 to download each HDS segment, default: <code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>hds-segment-threads</p></td>
+<tr class="row-even"><td><p>hds-segment-threads</p></td>
 <td><p>(int) The size of the thread pool used
 to download segments, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>hds-segment-timeout</p></td>
+<tr class="row-odd"><td><p>hds-segment-timeout</p></td>
 <td><p>(float) HDS segment connect and read
 timeout, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>hds-timeout</p></td>
+<tr class="row-even"><td><p>hds-timeout</p></td>
 <td><p>(float) Timeout for reading data from
 HDS streams, default: <code class="docutils literal notranslate"><span class="pre">60.0</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>hls-live-edge</p></td>
+<tr class="row-odd"><td><p>hls-live-edge</p></td>
 <td><p>(int) How many segments from the end
 to start live streams on, default: <code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>hls-segment-attempts</p></td>
+<tr class="row-even"><td><p>hls-segment-attempts</p></td>
 <td><p>(int) How many attempts should be done
 to download each HLS segment, default: <code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>hls-segment-ignore-names</p></td>
+<td><p>(str[]) List of segment names without
+file endings which should get filtered out,
+default: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>hls-segment-threads</p></td>
 <td><p>(int) The size of the thread pool used
@@ -909,7 +898,7 @@ with this exception.</p>
         </div>
 
         <div class="related-information">
-              Copyright &#169; 2020, Streamlink, Billy2011
+              Copyright &#169; 2021, Streamlink, Billy2011
             |
             Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
               and
