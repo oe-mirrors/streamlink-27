@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Changelog" href="changelog.html" /><link rel="prev" title="API Guide" href="api_guide.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2020.12.09.beta21"/>
-        <title>API Reference - Streamlink documentation</title>
+        <title>API Reference - Streamlink[-27] 1.27.2.1 documentation</title>
       <link rel="stylesheet" href="static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
     <link rel="stylesheet" href="static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="static/pygments_dark.css">
@@ -95,7 +95,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Streamlink 1.27.2.0 documentation</div></a>
+      <a href="index.html"><div class="brand">Streamlink[-27] 1.27.2.1 documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -108,13 +108,13 @@
       
       <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand centered" href="index.html">
   <div class="sidebar-logo-container">
-    <img class="sidebar-logo" src="static/icon.svg" alt="Streamlink"/>
+    <img class="sidebar-logo" src="static/icon.svg" alt="Streamlink[-27]"/>
   </div>
-  <p class="sidebar-brand-text">Streamlink</p>
+  <p class="sidebar-brand-text">Streamlink[-27]</p>
   <p class="sidebar-brand-oneliner">A command-line utility that extracts streams from various services and pipes them into a video player of choice.</p>
 </a>
 <div class="sidebar-versions centered" role="note" aria-label="versions">
-  <pre class="sidebar-versions-current">1.27.2.0</pre>
+  <pre class="sidebar-versions-current">1.27.2.1</pre>
   <dl class="sidebar-versions-others">
     <dd><a href="/api.html" class="version-current">Stable</a></dd>
     <dd><a href="/latest/api.html" class="">Latest</a></dd>
@@ -222,6 +222,12 @@ options and log settings.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
+<dt id="streamlink.Streamlink.logger">
+<em class="property">property </em><code class="sig-name descname">logger</code><a class="headerlink" href="#streamlink.Streamlink.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backwards compatible logger property
+:return: Logger instance</p>
+</dd></dl>
+<dl class="py method">
 <dt id="streamlink.Streamlink.resolve_url">
 <code class="sig-name descname">resolve_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">follow_redirect</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.resolve_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempts to find a plugin that can use this URL.</p>
@@ -247,6 +253,28 @@ not specified.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>url</strong> -- a URL to match against loaded plugins</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="streamlink.Streamlink.set_loglevel">
+<code class="sig-name descname">set_loglevel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.set_loglevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the log level used by this session.</p>
+<p>Valid levels are: "none", "error", "warning", "info"
+and "debug".</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>level</strong> -- level of logging to output</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt id="streamlink.Streamlink.set_logoutput">
+<code class="sig-name descname">set_logoutput</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output</span></em><span class="sig-paren">)</span><a class="headerlink" href="#streamlink.Streamlink.set_logoutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the log output used by this session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>output</strong> -- a file-like object with a write method</p>
 </dd>
 </dl>
 </dd></dl>
@@ -311,171 +339,166 @@ to start live streams on, default: <code class="docutils literal notranslate"><s
 <td><p>(int) How many attempts should be done
 to download each HLS segment, default: <code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>hls-segment-ignore-names</p></td>
-<td><p>(str[]) List of segment names without
-file endings which should get filtered out,
-default: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>hls-segment-threads</p></td>
+<tr class="row-odd"><td><p>hls-segment-threads</p></td>
 <td><p>(int) The size of the thread pool used
 to download segments, default: <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>hls-segment-stream-data</p></td>
+<tr class="row-even"><td><p>hls-segment-stream-data</p></td>
 <td><p>(bool) Stream HLS segment downloads,
 default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>hls-segment-timeout</p></td>
+<tr class="row-odd"><td><p>hls-segment-timeout</p></td>
 <td><p>(float) HLS segment connect and read
 timeout, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>hls-timeout</p></td>
+<tr class="row-even"><td><p>hls-timeout</p></td>
 <td><p>(float) Timeout for reading data from
 HLS streams, default: <code class="docutils literal notranslate"><span class="pre">60.0</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>http-proxy</p></td>
+<tr class="row-odd"><td><p>http-proxy</p></td>
 <td><p>(str) Specify a HTTP proxy to use for
 all HTTP requests</p></td>
 </tr>
-<tr class="row-odd"><td><p>https-proxy</p></td>
+<tr class="row-even"><td><p>https-proxy</p></td>
 <td><p>(str) Specify a HTTPS proxy to use for
 all HTTPS requests</p></td>
 </tr>
-<tr class="row-even"><td><p>http-cookies</p></td>
+<tr class="row-odd"><td><p>http-cookies</p></td>
 <td><p>(dict or str) A dict or a semi-colon (;)
 delimited str of cookies to add to each
 HTTP request, e.g. <code class="docutils literal notranslate"><span class="pre">foo=bar;baz=qux</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>http-headers</p></td>
+<tr class="row-even"><td><p>http-headers</p></td>
 <td><p>(dict or str) A dict or semi-colon (;)
 delimited str of headers to add to each
 HTTP request, e.g. <code class="docutils literal notranslate"><span class="pre">foo=bar;baz=qux</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>http-query-params</p></td>
+<tr class="row-odd"><td><p>http-query-params</p></td>
 <td><p>(dict or str) A dict or a ampersand (&amp;)
 delimited string of query parameters to
 add to each HTTP request,
 e.g. <code class="docutils literal notranslate"><span class="pre">foo=bar&amp;baz=qux</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>http-trust-env</p></td>
+<tr class="row-even"><td><p>http-trust-env</p></td>
 <td><p>(bool) Trust HTTP settings set in the
 environment, such as environment
 variables (HTTP_PROXY, etc) and
 ~/.netrc authentication</p></td>
 </tr>
-<tr class="row-even"><td><p>http-ssl-verify</p></td>
+<tr class="row-odd"><td><p>http-ssl-verify</p></td>
 <td><p>(bool) Verify SSL certificates,
 default: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>http-ssl-cert</p></td>
+<tr class="row-even"><td><p>http-ssl-cert</p></td>
 <td><p>(str or tuple) SSL certificate to use,
 can be either a .pem file (str) or a
 .crt/.key pair (tuple)</p></td>
 </tr>
-<tr class="row-even"><td><p>http-timeout</p></td>
+<tr class="row-odd"><td><p>http-timeout</p></td>
 <td><p>(float) General timeout used by all HTTP
 requests except the ones covered by
 other options, default: <code class="docutils literal notranslate"><span class="pre">20.0</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>http-stream-timeout</p></td>
+<tr class="row-even"><td><p>http-stream-timeout</p></td>
 <td><p>(float) Timeout for reading data from
 HTTP streams, default: <code class="docutils literal notranslate"><span class="pre">60.0</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>subprocess-errorlog</p></td>
+<tr class="row-odd"><td><p>subprocess-errorlog</p></td>
 <td><p>(bool) Log errors from subprocesses to
 a file located in the temp directory</p></td>
 </tr>
-<tr class="row-odd"><td><p>subprocess-errorlog-path</p></td>
+<tr class="row-even"><td><p>subprocess-errorlog-path</p></td>
 <td><p>(str) Log errors from subprocesses to
 a specific file</p></td>
 </tr>
-<tr class="row-even"><td><p>ringbuffer-size</p></td>
+<tr class="row-odd"><td><p>ringbuffer-size</p></td>
 <td><p>(int) The size of the internal ring
 buffer used by most stream types,
 default: <code class="docutils literal notranslate"><span class="pre">16777216</span></code> (16MB)</p></td>
 </tr>
-<tr class="row-odd"><td><p>rtmp-proxy</p></td>
+<tr class="row-even"><td><p>rtmp-proxy</p></td>
 <td><p>(str) Specify a proxy (SOCKS) that RTMP
 streams will use</p></td>
 </tr>
-<tr class="row-even"><td><p>rtmp-rtmpdump</p></td>
+<tr class="row-odd"><td><p>rtmp-rtmpdump</p></td>
 <td><p>(str) Specify the location of the
 rtmpdump executable used by RTMP streams,
 e.g. <code class="docutils literal notranslate"><span class="pre">/usr/local/bin/rtmpdump</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>rtmp-timeout</p></td>
+<tr class="row-even"><td><p>rtmp-timeout</p></td>
 <td><p>(float) Timeout for reading data from
 RTMP streams, default: <code class="docutils literal notranslate"><span class="pre">60.0</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>ffmpeg-ffmpeg</p></td>
+<tr class="row-odd"><td><p>ffmpeg-ffmpeg</p></td>
 <td><p>(str) Specify the location of the
 ffmpeg executable use by Muxing streams
 e.g. <code class="docutils literal notranslate"><span class="pre">/usr/local/bin/ffmpeg</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>ffmpeg-verbose</p></td>
+<tr class="row-even"><td><p>ffmpeg-verbose</p></td>
 <td><p>(bool) Log stderr from ffmpeg to the
 console</p></td>
 </tr>
-<tr class="row-even"><td><p>ffmpeg-verbose-path</p></td>
+<tr class="row-odd"><td><p>ffmpeg-verbose-path</p></td>
 <td><p>(str) Specify the location of the
 ffmpeg stderr log file</p></td>
 </tr>
-<tr class="row-odd"><td><p>ffmpeg-fout</p></td>
+<tr class="row-even"><td><p>ffmpeg-fout</p></td>
 <td><p>(str) The output file format
 when muxing with ffmpeg
 e.g. <code class="docutils literal notranslate"><span class="pre">matroska</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>ffmpeg-video-transcode</p></td>
+<tr class="row-odd"><td><p>ffmpeg-video-transcode</p></td>
 <td><p>(str) The codec to use if transcoding
 video when muxing with ffmpeg
 e.g. <code class="docutils literal notranslate"><span class="pre">h264</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>ffmpeg-audio-transcode</p></td>
+<tr class="row-even"><td><p>ffmpeg-audio-transcode</p></td>
 <td><p>(str) The codec to use if transcoding
 audio when muxing with ffmpeg
 e.g. <code class="docutils literal notranslate"><span class="pre">aac</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>ffmpeg-copyts</p></td>
+<tr class="row-odd"><td><p>ffmpeg-copyts</p></td>
 <td><p>(bool) When used with ffmpeg, do not shift input timestamps.</p></td>
 </tr>
-<tr class="row-odd"><td><p>ffmpeg-start-at-zero</p></td>
+<tr class="row-even"><td><p>ffmpeg-start-at-zero</p></td>
 <td><p>(bool) When used with ffmpeg and copyts,
 shift input timestamps so they start at zero
 default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>mux-subtitles</p></td>
+<tr class="row-odd"><td><p>mux-subtitles</p></td>
 <td><p>(bool) Mux available subtitles into the
 output stream.</p></td>
 </tr>
-<tr class="row-odd"><td><p>stream-segment-attempts</p></td>
+<tr class="row-even"><td><p>stream-segment-attempts</p></td>
 <td><p>(int) How many attempts should be done
 to download each segment, default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.
 General option used by streams not
 covered by other options.</p></td>
 </tr>
-<tr class="row-even"><td><p>stream-segment-threads</p></td>
+<tr class="row-odd"><td><p>stream-segment-threads</p></td>
 <td><p>(int) The size of the thread pool used
 to download segments, default: <code class="docutils literal notranslate"><span class="pre">1</span></code>.
 General option used by streams not
 covered by other options.</p></td>
 </tr>
-<tr class="row-odd"><td><p>stream-segment-timeout</p></td>
+<tr class="row-even"><td><p>stream-segment-timeout</p></td>
 <td><p>(float) Segment connect and read
 timeout, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>.
 General option used by streams not
 covered by other options.</p></td>
 </tr>
-<tr class="row-even"><td><p>stream-timeout</p></td>
+<tr class="row-odd"><td><p>stream-timeout</p></td>
 <td><p>(float) Timeout for reading data from
 stream, default: <code class="docutils literal notranslate"><span class="pre">60.0</span></code>.
 General option used by streams not
 covered by other options.</p></td>
 </tr>
-<tr class="row-odd"><td><p>locale</p></td>
+<tr class="row-even"><td><p>locale</p></td>
 <td><p>(str) Locale setting, in the RFC 1766 format
 eg. en_US or es_ES
 default: <code class="docutils literal notranslate"><span class="pre">system</span> <span class="pre">locale</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p>user-input-requester</p></td>
+<tr class="row-odd"><td><p>user-input-requester</p></td>
 <td><p>(UserInputRequester) instance of UserInputRequester
 to collect input from the user at runtime. Must be
 set before the plugins are loaded.

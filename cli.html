@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Plugins" href="plugin_matrix.html" /><link rel="prev" title="Installation" href="install.html" />
 
     <meta name="generator" content="sphinx-3.3.1, furo 2020.12.09.beta21"/>
-        <title>Command-Line Interface - Streamlink documentation</title>
+        <title>Command-Line Interface - Streamlink[-27] 1.27.2.1 documentation</title>
       <link rel="stylesheet" href="static/styles/furo.css?digest=a3f371badb8538d75df213ccffb17a4f6e8f3ac5">
     <link rel="stylesheet" href="static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="static/pygments_dark.css">
@@ -95,7 +95,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Streamlink 1.27.2.0 documentation</div></a>
+      <a href="index.html"><div class="brand">Streamlink[-27] 1.27.2.1 documentation</div></a>
     </div>
     <div class="header-right">
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
@@ -108,13 +108,13 @@
       
       <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand centered" href="index.html">
   <div class="sidebar-logo-container">
-    <img class="sidebar-logo" src="static/icon.svg" alt="Streamlink"/>
+    <img class="sidebar-logo" src="static/icon.svg" alt="Streamlink[-27]"/>
   </div>
-  <p class="sidebar-brand-text">Streamlink</p>
+  <p class="sidebar-brand-text">Streamlink[-27]</p>
   <p class="sidebar-brand-oneliner">A command-line utility that extracts streams from various services and pipes them into a video player of choice.</p>
 </a>
 <div class="sidebar-versions centered" role="note" aria-label="versions">
-  <pre class="sidebar-versions-current">1.27.2.0</pre>
+  <pre class="sidebar-versions-current">1.27.2.1</pre>
   <dl class="sidebar-versions-others">
     <dd><a href="/cli.html" class="version-current">Stable</a></dd>
     <dd><a href="/latest/cli.html" class="">Latest</a></dd>
@@ -1086,10 +1086,15 @@ is 1 and maximum is 10.</p>
 <dl class="std option">
 <dt id="cmdoption-hls-segment-ignore-names">
 <code class="sig-name descname">--hls-segment-ignore-names</code><code class="sig-prename descclassname"> NAMES</code><a class="headerlink" href="#cmdoption-hls-segment-ignore-names" title="Permalink to this definition">¶</a></dt>
-<dd><p>A comma-delimited list of segment names that will get filtered out.</p>
+<dd><p>A comma-delimited list of segment names that will not be fetched.</p>
 <p>Example: --hls-segment-ignore-names 000,001,002</p>
 <p>This will ignore every segment that ends with 000.ts, 001.ts and 002.ts</p>
 <p>Default is: <strong>None</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#cmdoption-hls-timeout"><code class="xref std std-option docutils literal notranslate"><span class="pre">--hls-timeout</span></code></a> must be increased, to a time that is longer than
+the ignored break.</p>
+</div>
 </dd></dl>
 <dl class="std option">
 <dt id="cmdoption-hls-segment-key-uri">
@@ -1456,20 +1461,6 @@ and reauthenticate.</p>
 not be broadcast in HD.</p>
 </dd></dl>
 </div>
-<div class="section" id="btsports">
-<h4>Btsports<a class="headerlink" href="#btsports" title="Permalink to this headline">¶</a></h4>
-<dl class="std option">
-<dt id="cmdoption-btsports-email">
-<code class="sig-name descname">--btsports-email</code><code class="sig-prename descclassname"> EMAIL</code><a class="headerlink" href="#cmdoption-btsports-email" title="Permalink to this definition">¶</a></dt>
-<dd><p>The email associated with your BT Sport account, required to access any
-BT Sport stream.</p>
-</dd></dl>
-<dl class="std option">
-<dt id="cmdoption-btsports-password">
-<code class="sig-name descname">--btsports-password</code><code class="sig-prename descclassname"> PASSWORD</code><a class="headerlink" href="#cmdoption-btsports-password" title="Permalink to this definition">¶</a></dt>
-<dd><p>Your BT Sport account password.</p>
-</dd></dl>
-</div>
 <div class="section" id="clubbingtv">
 <h4>Clubbingtv<a class="headerlink" href="#clubbingtv" title="Permalink to this headline">¶</a></h4>
 <dl class="std option">
@@ -1809,10 +1800,10 @@ and reauthenticate.</p>
 the following types are allowed:</p>
 <ul class="simple">
 <li><p>dash</p></li>
-<li><p>hls</p></li>
 <li><p>hls5</p></li>
+<li><p>hls7</p></li>
 </ul>
-<p>Default is: <strong>"hls"</strong>.</p>
+<p>Default is: <strong>"dash"</strong>.</p>
 </dd></dl>
 </div>
 </div>
@@ -1905,7 +1896,6 @@ the following types are allowed:</p>
 <li><a class="reference internal" href="#afreeca">Afreeca</a></li>
 <li><a class="reference internal" href="#animelab">Animelab</a></li>
 <li><a class="reference internal" href="#bbciplayer">Bbciplayer</a></li>
-<li><a class="reference internal" href="#btsports">Btsports</a></li>
 <li><a class="reference internal" href="#clubbingtv">Clubbingtv</a></li>
 <li><a class="reference internal" href="#crunchyroll">Crunchyroll</a></li>
 <li><a class="reference internal" href="#funimationnow">Funimationnow</a></li>
