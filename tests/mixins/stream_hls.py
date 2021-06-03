@@ -7,6 +7,7 @@ from threading import Event, Thread
 import requests_mock
 
 from streamlink import Streamlink
+from streamlink.compat import range
 from streamlink.stream.hls import HLSStream, HLSStreamWriter as _HLSStreamWriter
 
 
@@ -193,8 +194,11 @@ class TestMixinStreamHLS(unittest.TestCase):
     def mock(self, method, url, *args, **kwargs):
         self.mocks[url] = self.mocker.request(method, url, *args, **kwargs)
 
+    def get_mock(self, item):
+        return self.mocks[self.url(item)]
+
     def called(self, item):
-        return self.mocks[self.url(item)].called
+        return self.get_mock(item).called
 
     def url(self, item):
         return item.url(self.id())
