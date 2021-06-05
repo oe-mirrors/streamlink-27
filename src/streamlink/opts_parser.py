@@ -19,7 +19,7 @@ from streamlink.plugin import PluginOptions
 from streamlink.utils.args import comma_list, comma_list_filter, filesize, keyvalue, num
 from streamlink.utils.times import hours_minutes_seconds
 
-__version__ = "0.2.6"
+__version__ = "0.2.8"
 
 STREAM_PASSTHROUGH = ["hls", "http"]
 XDG_CONFIG_HOME = "/home/root/.config"
@@ -297,6 +297,10 @@ def build_parser():
         metavar="TIMEOUT",
     )
     transport.add_argument(
+        "--http-add-audio",
+        metavar="URL",
+    )
+    transport.add_argument(
         "--ringbuffer-size",
         metavar="SIZE",
         type=filesize,
@@ -385,6 +389,11 @@ def build_parser():
 
     stream = PARSER.add_argument_group("Stream options")
     stream.add_argument(
+        "--default-stream",
+        type=comma_list,
+        metavar="STREAM",
+    )
+    stream.add_argument(
         "--stream-types", "--stream-priority",
         metavar="TYPES",
         type=comma_list,
@@ -471,6 +480,9 @@ def setupTransportOpts(streamlink, args):
 
     if args.hds_timeout:
         streamlink.set_option("hds-timeout", args.hds_timeout)
+
+    if args.http_add_audio:
+        streamlink.set_option("http-add-audio", args.http_add_audio)
 
     if args.http_stream_timeout:
         streamlink.set_option("http-stream-timeout", args.http_stream_timeout)
