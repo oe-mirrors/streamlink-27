@@ -94,7 +94,6 @@ huomao                  - huomao.com         Yes   Yes
                         - huomao.tv
 huya                    huya.com             Yes   No
 idf1                    idf1.fr              Yes   Yes
-ine                     ine.com              ---   Yes
 invintus                player.invintus.com  Yes   Yes
 kugou                   fanxing.kugou.com    Yes   --
 latina                  latina.pe            Yes   No    Streams may be geo-restricted to Peru.
@@ -110,6 +109,7 @@ ltv_lsm_lv              ltv.lsm.lv           Yes   No    Streams may be geo-rest
 mediaklikk              - mediaklikk.hu      Yes   No    Streams may be geo-restricted to Hungary.
                         - m4sport.hu
 mediavitrina            mediavitrina.ru      Yes   No    Streams may be geo-restricted to Russia.
+mildom                  mildom.com           Yes   Yes
 mitele                  mitele.es            Yes   No    Streams may be geo-restricted to Spain.
 mjunoon                 mjunoon.tv           Yes   Yes   Streams may be geo-restricted to Pakistan.
 mrtmk                   play.mrt.com.mk      Yes   Yes   Streams may be geo-restricted to North Macedonia.
