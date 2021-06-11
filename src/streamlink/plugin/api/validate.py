@@ -97,13 +97,13 @@ class attr(SchemaContainer):
     """Validates an object's attributes."""
 
 
-class union_get:
+class union_get(object):
     def __init__(self, *keys, **kw):
         self.keys = keys
         self.seq = kw.get("seq", tuple)
 
 
-class xml_element:
+class xml_element(object):
     """A XML element."""
 
     def __init__(self, tag=None, text=None, attrib=None):
