@@ -1005,10 +1005,13 @@ def setup_logger_and_console(stream=sys.stdout, filename=None, level="info", jso
 
     if filename == "-":
         filename = os.path.join(LOG_DIR, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S.log"))
-
-    if filename:
         if not os.path.isdir(LOG_DIR):
             os.makedirs(LOG_DIR)
+    elif filename:
+        filename = os.path.expanduser(filename)
+        head = os.path.dirname(filename)
+        if head and not os.path.isdir(head):
+            os.makedirs(head)
 
     streamhandler = logger.basicConfig(
         stream=stream,

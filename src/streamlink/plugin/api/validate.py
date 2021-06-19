@@ -16,7 +16,10 @@
 """
 
 from copy import copy as copy_obj
-from typing import Any, Tuple, Union
+try:
+    from typing import Any, Tuple, Union
+except ImportError:
+    pass
 from xml.etree import ElementTree as ET
 
 try:

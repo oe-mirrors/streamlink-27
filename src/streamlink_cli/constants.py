@@ -29,12 +29,13 @@ if is_win32:
     LOG_DIR = os.path.join(tempfile.gettempdir(), "streamlink", "logs")
 else:
     XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME", "~/.config")
+    XDG_STATE_HOME = os.environ.get("XDG_STATE_HOME", "~/.local/state")
     CONFIG_FILES = [
-        os.path.expanduser(XDG_CONFIG_HOME + "/streamlink/config"),
+        os.path.join(os.path.expanduser(XDG_CONFIG_HOME), "streamlink", "config"),
         os.path.expanduser("~/.streamlinkrc")
     ]
-    PLUGINS_DIR = os.path.expanduser(XDG_CONFIG_HOME + "/streamlink/plugins")
-    LOG_DIR = os.path.join(os.path.expanduser("XDG_STATE_HOME", "~/.local/state"), "streamlink", "logs")
+    PLUGINS_DIR = os.path.join(os.path.expanduser(XDG_CONFIG_HOME), "streamlink", "plugins")
+    LOG_DIR = os.path.join(os.path.expanduser(XDG_STATE_HOME), "streamlink", "logs")
 
 STREAM_SYNONYMS = ["best", "worst", "best-unfiltered", "worst-unfiltered"]
 STREAM_PASSTHROUGH = ["hls", "http", "rtmp"]
