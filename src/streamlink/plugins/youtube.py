@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
+import json
 import logging
 import re
 
 from streamlink.compat import html_unescape, urlparse, urlunparse
-from streamlink.exceptions import NoStreamsError
 from streamlink.plugin import Plugin, PluginError
 from streamlink.plugin.api import useragents, validate
 from streamlink.plugin.api.utils import itertags
@@ -29,11 +29,9 @@ class YouTube(Plugin):
                 )(?P<video_id>[0-9A-z_-]{11})
             )
             |
-            (?:
-                (?P<embed_live>embed)/live_stream\?channel=[^/?&]+
-                |
-                (?:c(?:hannel)?/|user/)?[^/?]+/live/?$
-            )
+            embed/live_stream\?channel=(?P<embed_live>[^/?&]+)
+            |
+            (?:c(?:hannel)?/|user/)?[^/?]+/live/?$
         )
         |
         https?://youtu\.be/(?P<video_id_short>[0-9A-z_-]{11})
@@ -43,6 +41,7 @@ class YouTube(Plugin):
     _re_mime_type = re.compile(r"""^(?P<type>\w+)/(?P<container>\w+); codecs="(?P<codecs>.+)"$""")
 
     _url_canonical = "https://www.youtube.com/watch?v={video_id}"
+    _url_channelid_live = "https://www.youtube.com/channel/{channel_id}/live"
 
     # There are missing itags
     adp_video = {
@@ -73,17 +72,19 @@ class YouTube(Plugin):
         match = self._re_url.match(url)
         parsed = urlparse(url)
 
+        # translate input URLs to be able to find embedded data and to avoid unnecessary HTTP redirects
         if parsed.netloc == "gaming.youtube.com":
             url = urlunparse(parsed._replace(scheme="https", netloc="www.youtube.com"))
         elif match.group("video_id_short") is not None:
             url = self._url_canonical.format(video_id=match.group("video_id_short"))
         elif match.group("embed") is not None:
             url = self._url_canonical.format(video_id=match.group("video_id"))
+        elif match.group("embed_live") is not None:
+            url = self._url_channelid_live.format(channel_id=match.group("embed_live"))
         else:
             url = urlunparse(parsed._replace(scheme="https"))
 
         super(YouTube, self).__init__(url)
-        self._find_canonical_url = match.group("embed_live") is not None
         self.author = None
         self.title = None
         self.session.http.headers.update({'User-Agent': useragents.CHROME})
@@ -117,12 +118,6 @@ class YouTube(Plugin):
             weight, group = Plugin.stream_weight(stream)
 
         return weight, group
-
-    @classmethod
-    def _get_canonical_url(cls, html):
-        for link in itertags(html, "link"):
-            if link.attributes.get("rel") == "canonical":
-                return link.attributes.get("href")
 
     @classmethod
     def _schema_playabilitystatus(cls, data):
@@ -224,7 +219,7 @@ class YouTube(Plugin):
             consent,
             domain='.youtube.com', path="/")
 
-    def _get_data(self, url):
+    def _get_res(self, url):
         res = self.session.http.get(url)
         if urlparse(res.url).netloc == "consent.youtube.com":
             c_data = {}
@@ -236,27 +231,75 @@ class YouTube(Plugin):
             consent = self.session.http.cookies.get('CONSENT', domain='.youtube.com')
             if 'YES' in consent:
                 self.cache.set("consent_ck", consent)
+        return res
 
-        if self._find_canonical_url:
-            self._find_canonical_url = False
-            canonical_url = self._get_canonical_url(res.text)
-            if canonical_url is None:
-                raise NoStreamsError(url)
-            return self._get_data(canonical_url)
-
+    def _get_data(self, res):
         match = re.search(self._re_ytInitialPlayerResponse, res.text)
         if not match:
-            raise PluginError("Missing initial player response data")
-
+            log.debug("Missing initial player response data")
+            return
         return parse_json(match.group(1))
 
-    def _get_streams(self):
-        data = self._get_data(self.url)
+    def _get_data_from_api(self, res):
+        _i_video_id = self._re_url.match(self.url).group("video_id")
+        if _i_video_id is None:
+            for link in itertags(res.text, "link"):
+                if link.attributes.get("rel") == "canonical":
+                    try:
+                        _i_video_id = self._re_url.match(link.attributes.get("href")).group("video_id")
+                    except AttributeError:
+                        return
+                    break
+            else:
+                return
 
+        try:
+            _i_api_key = re.search(r'"INNERTUBE_API_KEY":\s*"([^"]+)"', res.text).group(1)
+        except AttributeError:
+            _i_api_key = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
+
+        try:
+            _i_version = re.search(r'"INNERTUBE_CLIENT_VERSION":\s*"([\d\.]+)"', res.text).group(1)
+        except AttributeError:
+            _i_version = "1.20210616.1.0"
+
+        res = self.session.http.post(
+            "https://www.youtube.com/youtubei/v1/player",
+            headers={"Content-Type": "application/json"},
+            params={"key": _i_api_key},
+            data=json.dumps({
+                "videoId": _i_video_id,
+                "context": {
+                    "client": {
+                        "clientName": "WEB_EMBEDDED_PLAYER",
+                        "clientVersion": _i_version,
+                        "platform": "DESKTOP",
+                        "clientFormFactor": "UNKNOWN_FORM_FACTOR",
+                        "browserName": "Chrome",
+                    },
+                    "user": {"lockedSafetyMode": "false"},
+                    "request": {"useSsl": "true"},
+                }
+            }),
+        )
+        return parse_json(res.text)
+
+    def _data_status(self, data):
+        if not data:
+            return False
         status, reason = self._schema_playabilitystatus(data)
         if status != "OK":
-            log.error("Could not get video info: {0}".format(reason))
-            return
+            log.error("Could not get video info - {0}: {1}".format(status, reason))
+            return False
+        return True
+
+    def _get_streams(self):
+        res = self._get_res(self.url)
+        data = self._get_data(res)
+        if not self._data_status(data):
+            data = self._get_data_from_api(res)
+            if not self._data_status(data):
+                return
 
         video_id, self.author, self.title, is_live = self._schema_videodetails(data)
         log.debug("Using video ID: {0}".format(video_id))
