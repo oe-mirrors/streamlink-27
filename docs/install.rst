@@ -82,7 +82,7 @@ Name                                 Notes
 **Automatically installed by the setup script**
 --------------------------------------------------------------------------------
 `python-futures`_                    Only needed on Python **2.7**.
-`python-requests`_                   At least version **2.21.0**.
+`python-requests`_                   At least version **2.26.0**
 `python-singledispatch`_             Only needed on Python **2.7**.
 `pycryptodome`_                      Required to play some encrypted streams
 `iso-639`_                           Used for localization settings, provides language information
@@ -115,7 +115,7 @@ With these two environment variables it is possible to use `pycrypto`_ instead o
 .. _python-setuptools: https://pypi.org/project/setuptools/
 .. _python-futures: https://pypi.org/project/futures/
 .. _python-singledispatch: https://pypi.org/project/singledispatch/
-.. _python-requests: https://requests.readthedocs.io/en/master/
+.. _python-requests: https://docs.python-requests.org/en/master/
 .. _RTMPDump: https://rtmpdump.mplayerhq.hu/
 .. _pycountry: https://pypi.org/project/pycountry/
 .. _pycrypto: https://www.dlitz.net/software/pycrypto/
@@ -128,6 +128,7 @@ With these two environment variables it is possible to use `pycrypto`_ instead o
 .. _websocket-client: https://pypi.org/project/websocket-client/
 .. _shutil_get_terminal_size: https://pypi.org/project/backports.shutil_get_terminal_size/
 .. _shutil_which: https://pypi.org/project/backports.shutil_which/
+.. _#3880: https://github.com/streamlink/streamlink/pull/3880
 
 .. _Development build:
 .. _build artifacts: https://github.com/Billy2011/streamlink-27/actions?query=event%3Aschedule+is%3Asuccess+branch%3Amaster
