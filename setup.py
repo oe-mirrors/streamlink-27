@@ -15,9 +15,10 @@ deps = [
     'futures;python_version<"3.0"',
     # Require singledispatch on Python <3.4
     'singledispatch;python_version<"3.4"',
-    "requests>=2.21.0,<3.0",
+    "requests>=2.26.0,<3.0",
     'urllib3[secure]>=1.23;python_version<"3.0"',
     "isodate",
+    "lxml>=4.6.3",
     "websocket-client>=0.58.0",
     # Support for SOCKS proxies
     "PySocks!=1.5.7,>=1.5.6",
