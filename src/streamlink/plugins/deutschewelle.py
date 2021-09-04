@@ -1,8 +1,6 @@
 import logging
 import re
 
-from lxml.etree import HTML, _Element as Element
-
 from streamlink.compat import parse_qsl, urlparse
 from streamlink.plugin import Plugin, pluginmatcher
 from streamlink.plugin.api import validate
@@ -19,22 +17,11 @@ class DeutscheWelle(Plugin):
     DEFAULT_CHANNEL = "1"
     API_URL = "https://www.dw.com/playersources/v-{media_id}?hls=true"
 
-    author = None
-    title = None
-
-    def get_author(self):
-        return self.author
-
-    def get_title(self):
-        return self.title
-
     def _find_metadata(self, elem):
-        # type: (Element)
         self.author = elem.xpath("string(.//input[@name='channel_name'][1]/@value)") or None
         self.title = elem.xpath("string(.//input[@name='media_title'][1]/@value)") or None
 
     def _get_live_streams(self, root):
-        # type: (Element)
         # check if a different language has been selected
         channel = (
             dict(parse_qsl(urlparse(self.url).query)).get("channel")
@@ -53,7 +40,6 @@ class DeutscheWelle(Plugin):
             return HLSStream.parse_variant_playlist(self.session, stream_url)
 
     def _get_vod_streams(self, root):
-        # type: (Element)
         media_id = root.xpath("string(.//input[@type='hidden'][@name='media_id'][1]/@value)")
         if not media_id:
             return
@@ -68,7 +54,6 @@ class DeutscheWelle(Plugin):
         return HLSStream.parse_variant_playlist(self.session, stream_url)
 
     def _get_audio_streams(self, root):
-        # type: (Element)
         self._find_metadata(root)
         file_name = root.xpath("string(.//input[@type='hidden'][@name='file_name'][1]/@value)")
         if file_name:
@@ -76,7 +61,7 @@ class DeutscheWelle(Plugin):
 
     def _get_streams(self):
         root = self.session.http.get(self.url, schema=validate.Schema(
-            validate.transform(HTML)
+            validate.parse_html()
         ))
         player_type = root.xpath("string(.//input[@type='hidden'][@name='player_type'][1]/@value)")
 
