@@ -3,7 +3,7 @@ from collections import OrderedDict
 try:
     from typing import Dict, Generic, Optional, TypeVar
     is_typing = True
-except:
+except ImportError:
     is_typing = False
 
 from streamlink.compat import is_py3, urljoin, urlparse
@@ -139,6 +139,8 @@ if is_typing:
     _baseClass = Generic[TCacheKey, TCacheValue]
 else:
     _baseClass = object
+
+
 class LRUCache(_baseClass):
     def __init__(self, num):
         # type: (int)
