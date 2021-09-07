@@ -57,7 +57,7 @@ class FFMPEGMuxer(StreamIO):
     DEFAULT_AUDIO_CODEC = "copy"
 
     @staticmethod
-    def copy_to_pipe(self, stream, pipe):
+    def copy_to_pipe(stream, pipe):
         # type: (StreamIO, NamedPipeBase)
         log.debug("Starting copy to pipe: {0}".format(pipe.path))
         pipe.open()
