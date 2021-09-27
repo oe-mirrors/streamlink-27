@@ -19,15 +19,17 @@ from streamlink.plugin import PluginOptions
 from streamlink.utils.args import comma_list, comma_list_filter, filesize, keyvalue, num
 from streamlink.utils.times import hours_minutes_seconds
 
-__version__ = "0.2.6"
+__version__ = "0.3.0"
 
-STREAM_PASSTHROUGH = ["hls", "http"]
+STREAM_PASSTHROUGH = ["hls", "http", "hls-multi", "dash"]
 XDG_CONFIG_HOME = "/home/root/.config"
+XDG_STATE_HOME = "/home/root/.local/state"
 CONFIG_FILES = [
     os.path.expanduser(XDG_CONFIG_HOME + "/streamlink/config"),
     os.path.expanduser(XDG_CONFIG_HOME + "/.streamlinkrc")
 ]
 PLUGINS_DIR = os.path.expanduser(XDG_CONFIG_HOME + "/streamlink/plugins")
+LOG_DIR = os.path.expanduser(XDG_STATE_HOME + "/streamlink/logs")
 
 _printable_re = re.compile(r"[{0}]".format(printable))
 _option_re = re.compile(r"""
@@ -121,6 +123,10 @@ def build_parser():
         default=DEFAULT_LEVEL,
     )
     general.add_argument(
+        "--logfile",
+        metavar="FILE",
+    )
+    general.add_argument(
         "--interface",
         type=str,
         metavar="INTERFACE",
@@ -202,40 +208,16 @@ def build_parser():
         type=num(float, min=0),
         metavar="SECONDS",
     )
-    transport.add_argument(
-        "--hds-segment-attempts",
-        type=num(int, min=0),
-        metavar="ATTEMPTS",
-    )
-    transport.add_argument(
-        "--hds-segment-threads",
-        type=num(int, max=10),
-        metavar="THREADS",
-    )
-    transport.add_argument(
-        "--hds-segment-timeout",
-        type=num(float, min=0),
-        metavar="TIMEOUT",
-    )
-    transport.add_argument(
-        "--hds-timeout",
-        type=num(float, min=0),
-        metavar="TIMEOUT",
-    )
+    transport.add_argument("--hds-segment-attempts", help=argparse.SUPPRESS)
+    transport.add_argument("--hds-segment-threads", help=argparse.SUPPRESS)
+    transport.add_argument("--hds-segment-timeout", help=argparse.SUPPRESS)
+    transport.add_argument("--hds-timeout", help=argparse.SUPPRESS)
     transport.add_argument(
         "--hls-live-edge",
         type=num(int, min=0),
         metavar="SEGMENTS",
     )
-    transport.add_argument(
-        "--hls-segment-stream-data",
-        action="store_true",
-    )
-    transport.add_argument(
-        "--hls-segment-attempts",
-        type=num(int, min=0),
-        metavar="ATTEMPTS",
-    )
+    transport.add_argument("--hls-segment-stream-data", action="store_true", help=argparse.SUPPRESS)
     transport.add_argument(
         "--hls-playlist-reload-attempts",
         type=num(int, min=0),
@@ -245,16 +227,9 @@ def build_parser():
         "--hls-playlist-reload-time",
         metavar="TIME",
     )
-    transport.add_argument(
-        "--hls-segment-threads",
-        type=num(int, max=10),
-        metavar="THREADS",
-    )
-    transport.add_argument(
-        "--hls-segment-timeout",
-        type=num(float, min=0),
-        metavar="TIMEOUT",
-    )
+    transport.add_argument("--hls-segment-attempts", help=argparse.SUPPRESS)
+    transport.add_argument("--hls-segment-threads", help=argparse.SUPPRESS)
+    transport.add_argument("--hls-segment-timeout", help=argparse.SUPPRESS)
     transport.add_argument(
         "--hls-segment-ignore-names",
         metavar="NAMES",
@@ -270,11 +245,7 @@ def build_parser():
         type=comma_list,
         metavar="CODE",
     )
-    transport.add_argument(
-        "--hls-timeout",
-        type=num(float, min=0),
-        metavar="TIMEOUT",
-    )
+    transport.add_argument("--hls-timeout", help=argparse.SUPPRESS)
     transport.add_argument(
         "--hls-start-offset",
         type=hours_minutes_seconds,
@@ -292,10 +263,10 @@ def build_parser():
         action="store_true",
     )
     transport.add_argument(
-        "--http-stream-timeout",
-        type=num(float, min=0),
-        metavar="TIMEOUT",
+        "--http-add-audio",
+        metavar="URL",
     )
+    transport.add_argument("--http-stream-timeout", help=argparse.SUPPRESS)
     transport.add_argument(
         "--ringbuffer-size",
         metavar="SIZE",
@@ -310,11 +281,7 @@ def build_parser():
         metavar="FILENAME",
     )
     transport.add_argument("--rtmpdump", help=argparse.SUPPRESS)
-    transport.add_argument(
-        "--rtmp-timeout",
-        type=num(float, min=0),
-        metavar="TIMEOUT",
-    )
+    transport.add_argument("--rtmp-timeout", help=argparse.SUPPRESS)
     transport.add_argument(
         "--stream-segment-attempts",
         type=num(int, min=0),
@@ -385,6 +352,11 @@ def build_parser():
 
     stream = PARSER.add_argument_group("Stream options")
     stream.add_argument(
+        "--default-stream",
+        type=comma_list,
+        metavar="STREAM",
+    )
+    stream.add_argument(
         "--stream-types", "--stream-priority",
         metavar="TYPES",
         type=comma_list,
@@ -418,32 +390,17 @@ def setupTransportOpts(streamlink, args):
     if args.hls_live_edge:
         streamlink.set_option("hls-live-edge", args.hls_live_edge)
 
-    if args.hls_segment_attempts:
-        streamlink.set_option("hls-segment-attempts", args.hls_segment_attempts)
-
-    if args.hls_segment_stream_data:
-        streamlink.set_option("hls-segment-stream-data", args.hls_segment_stream_data)
-
     if args.hls_playlist_reload_attempts:
         streamlink.set_option("hls-playlist-reload-attempts", args.hls_playlist_reload_attempts)
 
     if args.hls_playlist_reload_time:
         streamlink.set_option("hls-playlist-reload-time", args.hls_playlist_reload_time)
 
-    if args.hls_segment_threads:
-        streamlink.set_option("hls-segment-threads", args.hls_segment_threads)
-
-    if args.hls_segment_timeout:
-        streamlink.set_option("hls-segment-timeout", args.hls_segment_timeout)
-
     if args.hls_segment_ignore_names:
         streamlink.set_option("hls-segment-ignore-names", args.hls_segment_ignore_names)
 
     if args.hls_segment_key_uri:
         streamlink.set_option("hls-segment-key-uri", args.hls_segment_key_uri)
-
-    if args.hls_timeout:
-        streamlink.set_option("hls-timeout", args.hls_timeout)
 
     if args.hls_audio_select:
         streamlink.set_option("hls-audio-select", args.hls_audio_select)
@@ -460,20 +417,8 @@ def setupTransportOpts(streamlink, args):
     if args.hds_live_edge:
         streamlink.set_option("hds-live-edge", args.hds_live_edge)
 
-    if args.hds_segment_attempts:
-        streamlink.set_option("hds-segment-attempts", args.hds_segment_attempts)
-
-    if args.hds_segment_threads:
-        streamlink.set_option("hds-segment-threads", args.hds_segment_threads)
-
-    if args.hds_segment_timeout:
-        streamlink.set_option("hds-segment-timeout", args.hds_segment_timeout)
-
-    if args.hds_timeout:
-        streamlink.set_option("hds-timeout", args.hds_timeout)
-
-    if args.http_stream_timeout:
-        streamlink.set_option("http-stream-timeout", args.http_stream_timeout)
+    if args.http_add_audio:
+        streamlink.set_option("http-add-audio", args.http_add_audio)
 
     if args.ringbuffer_size:
         streamlink.set_option("ringbuffer-size", args.ringbuffer_size)
@@ -486,9 +431,30 @@ def setupTransportOpts(streamlink, args):
     elif args.rtmpdump:
         streamlink.set_option("rtmp-rtmpdump", args.rtmpdump)
 
+    # deprecated
+    if args.hds_segment_attempts:
+        streamlink.set_option("hds-segment-attempts", args.hds_segment_attempts)
+    if args.hds_segment_threads:
+        streamlink.set_option("hds-segment-threads", args.hds_segment_threads)
+    if args.hds_segment_timeout:
+        streamlink.set_option("hds-segment-timeout", args.hds_segment_timeout)
+    if args.hds_timeout:
+        streamlink.set_option("hds-timeout", args.hds_timeout)
+    if args.hls_segment_attempts:
+        streamlink.set_option("hls-segment-attempts", args.hls_segment_attempts)
+    if args.hls_segment_threads:
+        streamlink.set_option("hls-segment-threads", args.hls_segment_threads)
+    if args.hls_segment_timeout:
+        streamlink.set_option("hls-segment-timeout", args.hls_segment_timeout)
+    if args.hls_timeout:
+        streamlink.set_option("hls-timeout", args.hls_timeout)
+    if args.http_stream_timeout:
+        streamlink.set_option("http-stream-timeout", args.http_stream_timeout)
+
     if args.rtmp_timeout:
         streamlink.set_option("rtmp-timeout", args.rtmp_timeout)
 
+    # generic stream- arguments take precedence over deprecated stream-type arguments
     if args.stream_segment_attempts:
         streamlink.set_option("stream-segment-attempts", args.stream_segment_attempts)
 
@@ -656,4 +622,4 @@ def conv_argitems_to_arglist(argitems):
 
 
 __all__ = ["build_parser", "setup_args", "setupHttpSession", "setupTransportOpts", "conv_argitems_to_arglist",
-           "setup_plugin_args", "setup_plugin_options", "setup_config_files", "argsplit", "PLUGINS_DIR"]
+           "setup_plugin_args", "setup_plugin_options", "setup_config_files", "argsplit", "PLUGINS_DIR", "LOG_DIR"]

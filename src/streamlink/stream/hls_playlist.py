@@ -8,7 +8,11 @@ from itertools import starmap
 
 from isodate import ISO8601Error, parse_datetime
 
-from streamlink.compat import urljoin, urlparse
+from streamlink.compat import is_py2, urljoin, urlparse
+if is_py2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 log = logging.getLogger(__name__)
 
@@ -298,7 +302,7 @@ class M3U8Parser(object):
             self.m3u8.playlists.append(playlist)
 
     def parse(self, data):
-        lines = iter(filter(bool, data.splitlines()))
+        lines = (_l.rstrip() for _l in StringIO(data))
         try:
             line = next(lines)
         except StopIteration:

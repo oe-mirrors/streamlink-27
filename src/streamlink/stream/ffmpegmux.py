@@ -106,8 +106,12 @@ class FFMPEGMuxer(StreamIO):
         self._cmd.extend(['-c:v', videocodec])
         self._cmd.extend(['-c:a', audiocodec])
 
+        add_audio = options.pop("add_audio", False)
         for m in maps:
-            self._cmd.extend(["-map", str(m)])
+            if not m and add_audio:
+                self._cmd.extend(["-map", "0:v:0"])
+            else:
+                self._cmd.extend(["-map", str(m)])
 
         if copyts:
             self._cmd.extend(["-copyts"])
