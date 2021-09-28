@@ -113,7 +113,7 @@ class HLSStreamWriter(SegmentedStreamWriter):
                                          retries=self.retries,
                                          **request_params)
         except StreamError as err:
-            log.error("Failed to open segment {0}: {1}", sequence.num, err)
+            log.error("Failed to open segment {0}: {1}".format(sequence.num, err))
             return
 
     def write(self, sequence, res, chunk_size=8192):
@@ -154,6 +154,7 @@ class HLSStreamWorker(SegmentedStreamWorker):
         SegmentedStreamWorker.__init__(self, *args, **kwargs)
         self.stream = self.reader.stream
 
+        self.init_map = None
         self.playlist_changed = False
         self.playlist_end = None
         self.playlist_sequence = -1
@@ -284,6 +285,17 @@ class HLSStreamWorker(SegmentedStreamWorker):
         total_duration = 0
         while not self.closed:
             for sequence in filter(self.valid_sequence, self.playlist_sequences):
+                if self.init_map != sequence.segment.map:
+                    if sequence.segment.map is not None:
+                        self.init_map = sequence.segment.map
+                        _segment = hls_playlist.Segment(
+                            self.init_map.uri, 0, None, None, False, self.init_map.byterange, None, None)
+                        _sequence = Sequence(sequence.num, _segment)
+                        log.debug("Adding map segment {0} to queue", sequence.num)
+                        yield _sequence
+                    else:
+                        log.warning("Missing segment init map, maybe korrupted playlist, sequence num: {0}".format(
+                            sequence.num))
                 log.debug("Adding segment {0} to queue".format(sequence.num))
                 yield sequence
                 total_duration += sequence.segment.duration
@@ -302,7 +314,7 @@ class HLSStreamWorker(SegmentedStreamWorker):
                 try:
                     self.reload_playlist()
                 except StreamError as err:
-                    log.warning("Failed to reload playlist: {0}", err)
+                    log.warning("Failed to reload playlist: {0}".format(err))
 
 
 class HLSStreamReader(SegmentedStreamReader):
