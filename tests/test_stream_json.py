@@ -1,11 +1,14 @@
 import unittest
 
+# noinspection PyUnresolvedReferences
+from requests.utils import DEFAULT_ACCEPT_ENCODING
+
 from streamlink import Streamlink
-from streamlink.stream import AkamaiHDStream
-from streamlink.stream import HDSStream
-from streamlink.stream import HLSStream
-from streamlink.stream import HTTPStream
-from streamlink.stream import RTMPStream
+from streamlink.stream.akamaihd import AkamaiHDStream
+from streamlink.stream.hds import HDSStream
+from streamlink.stream.hls import HLSStream
+from streamlink.stream.http import HTTPStream
+from streamlink.stream.rtmpdump import RTMPStream
 from streamlink.stream.stream import Stream
 
 
@@ -31,7 +34,7 @@ class TestStreamToJSON(unittest.TestCase):
              "headers": {
                  "User-Agent": "Test",
                  "Accept": "*/*",
-                 "Accept-Encoding": "gzip, deflate",
+                 "Accept-Encoding": DEFAULT_ACCEPT_ENCODING,
                  "Connection": "keep-alive",
              }},
             stream.__json__()
@@ -49,7 +52,7 @@ class TestStreamToJSON(unittest.TestCase):
                 "headers": {
                     "User-Agent": "Test",
                     "Accept": "*/*",
-                    "Accept-Encoding": "gzip, deflate",
+                    "Accept-Encoding": DEFAULT_ACCEPT_ENCODING,
                     "Connection": "keep-alive",
                 }
             },
@@ -64,7 +67,7 @@ class TestStreamToJSON(unittest.TestCase):
                 "headers": {
                     "User-Agent": "Test",
                     "Accept": "*/*",
-                    "Accept-Encoding": "gzip, deflate",
+                    "Accept-Encoding": DEFAULT_ACCEPT_ENCODING,
                     "Connection": "keep-alive",
                 },
                 "master": master

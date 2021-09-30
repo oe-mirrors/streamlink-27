@@ -7,12 +7,12 @@ from requests.exceptions import ChunkedEncodingError, ConnectionError, ContentDe
 
 from streamlink.compat import str, urlparse
 from streamlink.exceptions import StreamError
-from streamlink.stream import hls_playlist
 from streamlink.stream.ffmpegmux import FFMPEGMuxer, MuxedStream
+from streamlink.stream.hls_playlist import load as load_hls_playlist
 from streamlink.stream.http import HTTPStream
-from streamlink.stream.segmented import (SegmentedStreamReader, SegmentedStreamWorker, SegmentedStreamWriter)
-from streamlink.utils import LazyFormatter
+from streamlink.stream.segmented import SegmentedStreamReader, SegmentedStreamWorker, SegmentedStreamWriter
 from streamlink.utils.crypto import AES, unpad
+from streamlink.utils.formatter import Formatter
 
 log = logging.getLogger(__name__)
 Sequence = namedtuple("Sequence", "num segment")
@@ -44,21 +44,21 @@ class HLSStreamWriter(SegmentedStreamWriter):
 
     def create_decryptor(self, key, sequence):
         if key.method != "AES-128":
-            raise StreamError("Unable to decrypt cipher {0}", key.method)
+            raise StreamError("Unable to decrypt cipher {0}".format(key.method))
 
         if not self.key_uri_override and not key.uri:
             raise StreamError("Missing URI to decryption key")
 
         if self.key_uri_override:
             p = urlparse(key.uri)
-            key_uri = LazyFormatter.format(
-                self.key_uri_override,
-                url=key.uri,
-                scheme=p.scheme,
-                netloc=p.netloc,
-                path=p.path,
-                query=p.query,
-            )
+            formatter = Formatter({
+                "url": lambda: key.uri,
+                "scheme": lambda: p.scheme,
+                "netloc": lambda: p.netloc,
+                "path": lambda: p.path,
+                "query": lambda: p.query,
+            })
+            key_uri = formatter.format(self.key_uri_override)
         else:
             key_uri = key.uri
 
@@ -192,7 +192,7 @@ class HLSStreamWorker(SegmentedStreamWorker):
                       self.playlist_sequence, self.playlist_end))
 
     def _reload_playlist(self, text, url):
-        return hls_playlist.load(text, url)
+        return load_hls_playlist(text, url)
 
     def reload_playlist(self):
         if self.closed:
@@ -390,7 +390,7 @@ class HLSStream(HTTPStream):
 
     @classmethod
     def _get_variant_playlist(cls, res):
-        return hls_playlist.load(res.text, base_uri=res.url)
+        return load_hls_playlist(res.text, base_uri=res.url)
 
     @classmethod
     def parse_variant_playlist(cls, session_, url, name_key="name",

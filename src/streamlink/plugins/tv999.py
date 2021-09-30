@@ -3,7 +3,7 @@ import re
 
 from streamlink.plugin import Plugin, pluginmatcher
 from streamlink.plugin.api import validate
-from streamlink.stream import HLSStream
+from streamlink.stream.hls import HLSStream
 from streamlink.utils.url import update_scheme
 
 log = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class TV999(Plugin):
         validate.transform(hls_re.search),
         validate.any(None, validate.all(
             validate.get(1),
-            validate.transform(lambda x: update_scheme('http:', x)),
+            validate.transform(lambda x: update_scheme("https://", x)),
             validate.url(),
         )),
     )

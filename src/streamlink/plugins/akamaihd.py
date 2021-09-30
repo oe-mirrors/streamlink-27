@@ -3,8 +3,8 @@ import re
 
 from streamlink.plugin import Plugin, pluginmatcher
 from streamlink.plugin.plugin import parse_params
-from streamlink.stream import AkamaiHDStream
-from streamlink.utils import update_scheme
+from streamlink.stream.akamaihd import AkamaiHDStream
+from streamlink.utils.url import update_scheme
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 class AkamaiHDPlugin(Plugin):
     def _get_streams(self):
         data = self.match.groupdict()
-        url = update_scheme("http://", data.get("url"))
+        url = update_scheme("http://", data.get("url"), force=False)
         params = parse_params(data.get("params"))
         log.debug("URL={0}; params={1}".format(url, params))
 

@@ -3,8 +3,8 @@ import re
 
 from streamlink.plugin import Plugin, pluginmatcher
 from streamlink.plugin.plugin import LOW_PRIORITY, parse_params
-from streamlink.stream import HDSStream
-from streamlink.utils import update_scheme
+from streamlink.stream.hds import HDSStream
+from streamlink.utils.url import update_scheme
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 class HDSPlugin(Plugin):
     def _get_streams(self):
         data = self.match.groupdict()
-        url = update_scheme("http://", data.get("url"))
+        url = update_scheme("http://", data.get("url"), force=False)
         params = parse_params(data.get("params"))
         log.debug("URL={0}; params={1}".format(url, params))
 

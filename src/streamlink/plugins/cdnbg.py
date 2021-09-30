@@ -5,8 +5,8 @@ from streamlink.compat import html_unescape, urlparse
 from streamlink.plugin import Plugin, pluginmatcher
 from streamlink.plugin.api import validate
 from streamlink.plugin.api.utils import itertags
-from streamlink.stream import HLSStream
-from streamlink.utils import update_scheme
+from streamlink.stream.hls import HLSStream
+from streamlink.utils.url import update_scheme
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class CDNBG(Plugin):
                 for iframe in itertags(res.text, "iframe"):
                     iframe_url = iframe.attributes.get("src")
                     if iframe_url and "cdn.bg" in iframe_url:
-                        iframe_url = update_scheme(self.url, html_unescape(iframe_url))
+                        iframe_url = update_scheme("https://", html_unescape(iframe_url), force=False)
                         break
                 else:
                     return
