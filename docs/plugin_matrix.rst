@@ -125,6 +125,7 @@ onetv                   1tv.ru               Yes   No    Streams may be geo-rest
 openrectv               openrec.tv           Yes   Yes
 orf_tvthek              tvthek.orf.at        Yes   Yes
 ozolio                  ozolio.com           Yes   No
+pandalive               pandalive.co.kr      Yes   No
 picarto                 picarto.tv           Yes   Yes
 piczel                  piczel.tv            Yes   No
 pixiv                   sketch.pixiv.net     Yes   --
@@ -193,9 +194,8 @@ tv3cat                  ccma.cat             Yes   Yes   Streams may be geo-rest
 tv4play                 - tv4play.se         Yes   Yes   Streams may be geo-restricted to Sweden.
                                                          Only non-premium streams currently supported.
                         - fotbollskanalen.se
-tv5monde                - tv5monde.com       Yes   Yes   Streams may be geo-restricted to France, Belgium and Switzerland.
-                        - tv5mondeplus.com
-                        - tv5mondepl... [8]_
+tv5monde                - tv5monde.com       Yes   Yes   Streams may be geo-restricted to France, Belgium or Switzerland
+                        - tivi5mondeplus.com
 tv8                     tv8.com.tr           Yes   No
 tv360                   tv360.com.tr         Yes   No
 tv999                   tv999.bg             Yes   --    Streams are geo-restricted to Bulgaria
@@ -244,4 +244,3 @@ zhanqi                  zhanqi.tv            Yes   No
 .. [5] mediathek.daserste.de
 .. [6] players.brightcove.net
 .. [7] player.theplatform.com
-.. [8] tv5mondeplusafrique.com
