@@ -2,7 +2,7 @@
   YoutubeDL Plugin for Streamlink by Billy2011.
   This plugin is only for youtube streams.
   The URL's must have a "youtubedl://" prefix
-  Version 0.20 / 2021-06-19
+  Version 0.30 / 2021-09-30
 """
 
 from __future__ import unicode_literals
@@ -12,14 +12,9 @@ import os
 import re
 from platform import node as hostname
 
-from streamlink.compat import html_unescape, urlparse
-from streamlink.exceptions import NoStreamsError
-from streamlink.plugin import Plugin, PluginArgument, PluginArguments, PluginError
-from streamlink.plugin.api import validate
-from streamlink.plugin.api.utils import itertags
+from streamlink.plugin import Plugin, PluginArgument, PluginArguments, PluginError, pluginmatcher
 from streamlink.stream import HLSStream, HTTPStream
 from streamlink.stream.ffmpegmux import MuxedStream
-from streamlink.utils import parse_json, update_scheme
 
 log = logging.getLogger(__name__)
 
@@ -31,34 +26,33 @@ except ImportError:
     log.trace("YoutubeDL is not available")
 
 
-class YouTubeDL(Plugin):
-    _url_re = re.compile(
-        r"""(?x)youtubedl://(?:https?://)?(?:\w+\.)?youtu(?:\.be|be\.com)
+@pluginmatcher(re.compile(r"""
+    youtubedl://(?:https?://)?(?:\w+\.)?youtu(?:\.be|be\.com)
+    (?:
         (?:
-            (?:
-                /(?:
-                    watch.+v=
-                    |
-                    embed/(?!live_stream)
-                    |
-                    (?:v/)?
-                )(?P<video_id>[\w-]{11})(?P<pl_id>(?:&list=)[\w-]+)?
-            )
-            |
-            (?:
-                /(?:
-                    (?:user|c(?:hannel)?)/
-                    |
-                    embed/live_stream\?channel=
-                )[^/?&]+
-            )
-            |
-            (?:
-                /(?:c/)?[^/?]+/live/?$
-            )
+            /(?:
+                watch.+v=
+                |
+                embed/(?!live_stream)
+                |
+                (?:v/)?
+            )(?P<video_id>[\w-]{11})(?P<pl_id>(?:&list=)[\w-]+)?
         )
-    """
+        |
+        (?:
+            /(?:
+                (?:user|c(?:hannel)?)/
+                |
+                embed/live_stream\?channel=
+            )[^/?&]+
+        )
+        |
+        (?:
+            /(?:c/)?[^/?]+/live/?$
+        )
     )
+""", re.VERBOSE))
+class YouTubeDL(Plugin):
     _re_ytInitialPlayerResponse = re.compile(r"""var\s+ytInitialPlayerResponse\s*=\s*({.*?});\s*var\s+meta\s*=""", re.DOTALL)
 
     _url_canonical = "https://www.youtube.com/watch?v={video_id}"
@@ -147,21 +141,6 @@ class YouTubeDL(Plugin):
         ),
     )
 
-    def __init__(self, url):
-        super(YouTubeDL, self).__init__(url)
-
-        self.author = None
-        self.title = None
-        self.video_id = None
-        consent = self.cache.get("consent_ck")
-        if consent is not None:
-            self.set_consent_ck(consent)
-        self._find_canonical_url = None
-
-    @classmethod
-    def can_handle_url(cls, url):
-        return cls._url_re.match(url) and youtubedl
-
     @classmethod
     def stream_weight(cls, stream):
         match_3d = re.match(r"(\w+)_3d", stream)
@@ -178,38 +157,6 @@ class YouTubeDL(Plugin):
             weight, group = Plugin.stream_weight(stream)
 
         return weight, group
-
-    @classmethod
-    def _get_canonical_url(cls, html):
-        for link in itertags(html, "link"):
-            if link.attributes.get("rel") == "canonical":
-                return link.attributes.get("href")
-
-    @classmethod
-    def _schema_playabilitystatus(cls, data):
-        schema = validate.Schema(
-            {"playabilityStatus": {
-                "status": validate.text,
-                validate.optional("reason"): validate.text
-            }},
-            validate.get("playabilityStatus"),
-            validate.union_get("status", "reason")
-        )
-        return validate.validate(schema, data)
-
-    @classmethod
-    def _schema_videodetails(cls, data):
-        schema = validate.Schema(
-            {"videoDetails": {
-                "videoId": validate.text,
-                "author": validate.text,
-                "title": validate.text,
-                validate.optional("isLiveContent"): validate.transform(bool)
-            }},
-            validate.get("videoDetails"),
-            validate.union_get("videoId", "author", "title", "isLiveContent")
-        )
-        return validate.validate(schema, data)
 
     def _create_adaptive_streams(self, info, streams):
         if not MuxedStream.is_usable(self.session):
@@ -275,54 +222,6 @@ class YouTubeDL(Plugin):
 
         return streams
 
-    def set_consent_ck(self, consent):
-        self.session.http.cookies.set(
-            'CONSENT',
-            consent,
-            domain='.youtube.com', path="/")
-
-    def _get_data(self, url):
-        res = self.session.http.get(url)
-        if urlparse(res.url).netloc == "consent.youtube.com":
-            c_data = {}
-            for _i in itertags(res.text, "input"):
-                if _i.attributes.get("type") == "hidden":
-                    c_data[_i.attributes.get("name")] = html_unescape(_i.attributes.get("value"))
-            log.debug("c_data_keys: {}".format(', '.join(c_data.keys())))
-            res = self.session.http.post("https://consent.youtube.com/s", data=c_data)
-            consent = self.session.http.cookies.get('CONSENT', domain='.youtube.com')
-            if 'YES' in consent:
-                self.cache.set("consent_ck", consent)
-
-        if self._find_canonical_url:
-            self._find_canonical_url = False
-            canonical_url = self._get_canonical_url(res.text)
-            if canonical_url is None:
-                raise NoStreamsError(url)
-            return self._get_data(canonical_url)
-
-        match = re.search(self._re_ytInitialPlayerResponse, res.text)
-        if not match:
-            raise PluginError("Missing initial player response data")
-
-        return parse_json(match.group(1))
-
-    def _find_video_id(self, url):
-        m = self._url_re.match(url)
-        if m and m.group("video_id"):
-            log.debug("Video & PL ID from URL")
-            return m.group("video_id"), m.group("pl_id")
-
-        data = self._get_data(update_scheme("https://", url.replace("youtubedl://", "")))
-        status, reason = self._schema_playabilitystatus(data)
-        if status != "OK":
-            log.error("Could not get video info: {0}".format(reason))
-            return None, None
-
-        video_id, self.author, self.title, is_live = self._schema_videodetails(data)
-        log.debug("Using video ID: {0}".format(video_id))
-        return video_id, None
-
     def _save2M3U(self, pl_path, info, ua):
         m3u = "#EXTM3U,$MODE=IPTV\n"
         if pl_path.startswith("/tmp/." + __name__):
@@ -373,10 +272,14 @@ class YouTubeDL(Plugin):
 
     def _get_streams(self):
         is_live = False
+        self.video_id = self.match.group("video_id")
+        self.pl_id = self.match.group("pl_id")
         if not self.video_id:
-            self.video_id, self.pl_id = self._find_video_id(self.url)
-            if not self.video_id:
-                return
+            log.trace("Bypass youtubedl...")
+            return self.session.streams(self.url.replace("youtubedl://", ""))
+
+        if not youtubedl:
+            return
 
         info = self._get_stream_info(self.video_id, self.pl_id)
         if not info:
