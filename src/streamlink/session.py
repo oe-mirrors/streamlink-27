@@ -15,8 +15,8 @@ from streamlink.compat import is_win32, lru_cache
 from streamlink.exceptions import NoPluginError, PluginError
 from streamlink.logger import Logger, StreamlinkLogger
 from streamlink.options import Options
-from streamlink.plugin import Plugin, api
-from streamlink.plugin.plugin import NORMAL_PRIORITY, NO_PRIORITY
+from streamlink.plugin.api.http_session import HTTPSession
+from streamlink.plugin.plugin import NORMAL_PRIORITY, NO_PRIORITY, Plugin
 from streamlink.utils.l10n import Localization
 from streamlink.utils.url import update_scheme
 
@@ -54,7 +54,7 @@ class Streamlink(object):
        options and log settings."""
 
     def __init__(self, options=None):
-        self.http = api.HTTPSession()
+        self.http = HTTPSession()
         self.options = Options({
             "interface": None,
             "ipv4": False,
@@ -62,6 +62,7 @@ class Streamlink(object):
             "hds-live-edge": 10.0,
             "hls-live-edge": 3,
             "hls-segment-ignore-names": [],
+            "hls-segment-stream-data": False,
             "hls-playlist-reload-attempts": 3,
             "hls-playlist-reload-time": "default",
             "hls-start-offset": 0,
@@ -496,7 +497,6 @@ class Streamlink(object):
     def load_plugin(self, name, file, pathname, desc):
         # Set the global http session for this plugin
         user_input_requester = self.get_option("user-input-requester")
-        api.http = self.http
 
         module = imp.load_module(name, file, pathname, desc)
 
