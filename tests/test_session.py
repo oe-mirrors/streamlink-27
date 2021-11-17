@@ -9,7 +9,6 @@ from streamlink import NoPluginError, Streamlink
 from streamlink.compat import is_py2
 from streamlink.plugin import HIGH_PRIORITY, LOW_PRIORITY, NORMAL_PRIORITY, NO_PRIORITY, Plugin, pluginmatcher
 from streamlink.session import print_small_exception
-from streamlink.stream.akamaihd import AkamaiHDStream
 from streamlink.stream.hls import HLSStream
 from streamlink.stream.http import HTTPStream
 from streamlink.stream.rtmpdump import RTMPStream
@@ -205,7 +204,6 @@ class TestSession(unittest.TestCase):
         self.assertTrue(isinstance(streams["rtmp"], RTMPStream))
         self.assertTrue(isinstance(streams["http"], HTTPStream))
         self.assertTrue(isinstance(streams["hls"], HLSStream))
-        self.assertTrue(isinstance(streams["akamaihd"], AkamaiHDStream))
 
     def test_plugin_stream_types(self):
         channel = self.session.resolve_url("http://test.se/channel")
@@ -279,12 +277,12 @@ class TestSession(unittest.TestCase):
         self.assertEqual(session.localization.language.alpha2, "en")
         self.assertEqual(session.localization.language_code, "en_US")
 
-    @patch("streamlink.session.api")
-    def test_interface(self, mock_api):
+    @patch("streamlink.session.HTTPSession")
+    def test_interface(self, mock_httpsession):
         adapter_http = Mock(poolmanager=Mock(connection_pool_kw={}))
         adapter_https = Mock(poolmanager=Mock(connection_pool_kw={}))
         adapter_foo = Mock(poolmanager=Mock(connection_pool_kw={}))
-        mock_api.HTTPSession.return_value = Mock(adapters={
+        mock_httpsession.return_value = Mock(adapters={
             "http://": adapter_http,
             "https://": adapter_https,
             "foo://": adapter_foo
