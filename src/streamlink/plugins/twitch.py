@@ -36,8 +36,18 @@ class TwitchM3U8(M3U8):
 class TwitchM3U8Parser(M3U8Parser):
     def parse_tag_ext_x_twitch_prefetch(self, value):
         segments = self.m3u8.segments
-        if segments:
-            segments.append(segments[-1]._replace(uri=self.uri(value), prefetch=True))
+        if not segments:  # pragma: no cover
+            return
+        last = segments[-1]
+        # Use the average duration of all regular segments for the duration of prefetch segments.
+        # This is better than using the duration of the last segment when regular segment durations vary a lot.
+        # In low latency mode, the playlist reload time is the duration of the last segment.
+        duration = last.duration if last.prefetch else sum(segment.duration for segment in segments) / float(len(segments))
+        segments.append(last._replace(
+            uri=self.uri(value),
+            duration=duration,
+            prefetch=True
+        ))
 
     def parse_tag_ext_x_daterange(self, value):
         super(TwitchM3U8Parser, self).parse_tag_ext_x_daterange(value)
@@ -305,7 +315,7 @@ class TwitchAPI:
             login=channel_or_vod if is_live else "",
             isVod=not is_live,
             vodID=channel_or_vod if not is_live else "",
-            playerType="site"
+            playerType="embed"
         )
         subschema = validate.any(None, validate.all(
             {
@@ -596,6 +606,10 @@ class Twitch(Plugin):
 
         # only get the token once the channel has been resolved
         log.debug("Getting live HLS streams for {0}".format(self.channel))
+        self.session.http.headers.update({
+            "referer": "https://player.twitch.tv",
+            "origin": "https://player.twitch.tv",
+        })
         sig, token, restricted_bitrates = self._access_token(True, self.channel)
         url = self.usher.channel(self.channel, sig=sig, token=token, fast_bread=True)
 
