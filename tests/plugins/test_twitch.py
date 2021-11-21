@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import requests_mock
 
 from streamlink import Streamlink
+from streamlink.compat import is_py2
 from streamlink.plugins.twitch import Twitch, TwitchHLSStream, TwitchHLSStreamReader, TwitchHLSStreamWriter
 from tests.mixins.stream_hls import EventedHLSStreamWriter, Playlist, Segment as _Segment, Tag, TestMixinStreamHLS
 from tests.mock import MagicMock, call, patch
@@ -295,6 +296,15 @@ class TestTwitchHLSStream(TestMixinStreamHLS, unittest.TestCase):
             call("Waiting for pre-roll ads to finish, be patient"),
             call("This is not a low latency stream")
         ])
+
+    def test_hls_low_latency_no_ads_reload_time(self):
+        self.subject([
+            Playlist(0, [Segment(0, duration=5), Segment(1, duration=7), Segment(2, duration=11), SegmentPrefetch(3)], end=True)
+        ], low_latency=True)
+
+        self.await_write(4)
+        self.await_read(read_all=True)
+        self.assertEqual(self.thread.reader.worker.playlist_reload_time, 23.0 / 3)
 
 
 class TestTwitchMetadata(unittest.TestCase):
