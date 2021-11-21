@@ -1,7 +1,7 @@
 import copy
 import logging
 import re
-from collections import Mapping, deque, namedtuple
+from collections import deque, namedtuple
 from datetime import datetime, timedelta
 from random import randint
 from threading import Event, RLock
@@ -12,7 +12,7 @@ except ImportError:
 
 from requests import Response
 
-from streamlink.compat import range, urljoin, urlunparse
+from streamlink.compat import Mapping, range, urljoin, urlunparse
 from streamlink.exceptions import PluginError, StreamError
 from streamlink.plugin import Plugin, PluginArgument, PluginArguments, pluginmatcher
 from streamlink.plugin.api import useragents, validate
