@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import requests_mock
 
 from streamlink import Streamlink
-from streamlink.compat import is_py2
 from streamlink.plugins.twitch import Twitch, TwitchHLSStream, TwitchHLSStreamReader, TwitchHLSStreamWriter
 from tests.mixins.stream_hls import EventedHLSStreamWriter, Playlist, Segment as _Segment, Tag, TestMixinStreamHLS
 from tests.mock import MagicMock, call, patch
