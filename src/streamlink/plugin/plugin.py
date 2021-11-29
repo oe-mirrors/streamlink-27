@@ -140,6 +140,13 @@ def stream_sorting_filter(expr, stream_weight):
     return func
 
 
+def parse_url_params(url):
+    split = url.split(" ", 1)
+    url = split[0]
+    params = split[1] if len(split) > 1 else ''
+    return url, parse_params(params)
+
+
 def parse_params(params=None):
     # type: (Optional[str]) -> Dict[str, Any]
     rval = {}
