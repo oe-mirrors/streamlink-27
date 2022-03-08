@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+$url twitch.tv
+$type live, vod
+$notes Low latency streaming is supported
+"""
+
 import json
 import logging
 import re
@@ -454,7 +460,7 @@ class TwitchAPI:
         |
         (?P<channel>[^/?]+)
         (?:
-            /video/(?P<video_id>\d+)
+            /v(?:ideo)?/(?P<video_id>\d+)
             |
             /clip/(?P<clip_name>[^/?]+)
         )?
