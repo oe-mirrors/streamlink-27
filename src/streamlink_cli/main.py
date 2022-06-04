@@ -31,7 +31,7 @@ from streamlink_cli.compat import is_py2, is_win32, stdout
 from streamlink_cli.console import ConsoleOutput, ConsoleUserInputRequester
 from streamlink_cli.constants import CONFIG_FILES, DEFAULT_STREAM_METADATA, LOG_DIR, PLUGINS_DIR, STREAM_SYNONYMS
 from streamlink_cli.output import FileOutput, PlayerOutput
-from streamlink_cli.utils import Formatter, HTTPServer, ignored, progress, stream_to_url
+from streamlink_cli.utils import Formatter, HTTPServer, ignored, progress
 
 if is_py2:
     reload(sys)  # noqa: F821
@@ -132,7 +132,10 @@ def create_output(formatter):
             http = create_http_server()
 
         if args.record:
-            record = check_file_output(formatter.path(args.record, args.fs_safe_rules), args.force)
+            if args.record == "-":
+                record = FileOutput(fd=stdout)
+            else:
+                record = check_file_output(formatter.path(args.record, args.fs_safe_rules), args.force)
 
         log.info("Starting player: {0}".format(args.player))
 
@@ -261,11 +264,20 @@ def output_stream_passthrough(formatter, stream):
     """Prepares a filename to be passed to the player."""
     global output
 
-    filename = '"{0}"'.format(stream_to_url(stream))
-    output = PlayerOutput(args.player, args=args.player_args,
-                          filename=filename, call=True,
-                          quiet=not args.verbose_player,
-                          title=formatter.title(args.title, defaults=DEFAULT_STREAM_METADATA) if args.title else args.url)
+    try:
+        url = stream.to_url()
+    except TypeError:
+        console.exit("The stream specified cannot be translated to a URL")
+        return False
+
+    output = PlayerOutput(
+        args.player,
+        args=args.player_args,
+        filename='"{0}"'.format(url),
+        call=True,
+        quiet=not args.verbose_player,
+        title=formatter.title(args.title, defaults=DEFAULT_STREAM_METADATA) if args.title else args.url
+    )
 
     try:
         log.info("Starting player: {0}".format(args.player))
@@ -918,7 +930,7 @@ def setup_plugin_options(session, plugin):
 
 
 def log_root_warning():
-    if hasattr(os, "getuid"):
+    if hasattr(os, "geteuid"):  # pragma: no branch
         if os.geteuid() == 0:
             log.info("streamlink is running as root! Be careful!")
 
@@ -1033,7 +1045,7 @@ def main():
 
     # Console output should be on stderr if we are outputting
     # a stream to stdout.
-    if args.stdout or args.output == "-" or args.record_and_pipe:
+    if args.stdout or args.output == "-" or args.record == "-" or args.record_and_pipe:
         console_out = sys.stderr
     else:
         console_out = sys.stdout

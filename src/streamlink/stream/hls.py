@@ -48,7 +48,7 @@ class HLSStreamWriter(SegmentedStreamWriter):
             raise StreamError("Unable to decrypt cipher {0}".format(key.method))
 
         if not self.key_uri_override and not key.uri:
-            raise StreamError("Missing URI to decryption key")
+            raise StreamError("Missing URI for decryption key")
 
         if self.key_uri_override:
             p = urlparse(key.uri)
@@ -108,7 +108,7 @@ class HLSStreamWriter(SegmentedStreamWriter):
                 return
 
             return self.session.http.get(sequence.segment.uri,
-                                         stream=(self.stream_data and not sequence.segment.key),
+                                         stream=self.stream_data,
                                          timeout=self.timeout,
                                          exception=StreamError,
                                          retries=self.retries,
@@ -117,34 +117,37 @@ class HLSStreamWriter(SegmentedStreamWriter):
             log.error("Failed to open segment {0}: {1}", sequence.num, err)
             return
 
-    def write(self, sequence, res, chunk_size=8192):
+    def write(self, sequence, result, chunk_size=8192):
         if sequence.segment.key and sequence.segment.key.method != "NONE":
             try:
                 decryptor = self.create_decryptor(sequence.segment.key,
                                                   sequence.num)
-            except StreamError as err:
+            except (StreamError, ValueError) as err:
                 log.error("Failed to create decryptor: {0}".format(err))
                 self.close()
                 return
 
-            data = res.content
-            # If the input data is not a multiple of 16, cut off any garbage
-            garbage_len = len(data) % AES.block_size
-            if garbage_len:
-                log.debug("Cutting off {0} bytes of garbage "
-                          "before decrypting".format(garbage_len))
-                decrypted_chunk = decryptor.decrypt(data[:-garbage_len])
-            else:
-                decrypted_chunk = decryptor.decrypt(data)
-
-            chunk = unpad(decrypted_chunk, AES.block_size, style="pkcs7")
-            self.reader.buffer.write(chunk)
+            try:
+                # Unlike plaintext segments, encrypted segments can't be written to the buffer in small chunks
+                # because of the byte padding at the end of the decrypted data, which means that decrypting in
+                # smaller chunks is unnecessary if the entire segment needs to be kept in memory anyway, unless
+                # we defer the buffer writes by one read call and apply the unpad call only to the last read call.
+                encrypted_chunk = result.content
+                decrypted_chunk = decryptor.decrypt(encrypted_chunk)
+                chunk = unpad(decrypted_chunk, AES.block_size, style="pkcs7")
+                self.reader.buffer.write(chunk)
+            except (ChunkedEncodingError, ContentDecodingError, ConnectionError) as err:
+                log.error("Download of segment {0} failed: {1}".format(sequence.num, err))
+                return
+            except ValueError as err:
+                log.error("Error while decrypting segment {0}: {1}".format(sequence.num, err))
+                return
         else:
             try:
-                for chunk in res.iter_content(chunk_size):
+                for chunk in result.iter_content(chunk_size):
                     self.reader.buffer.write(chunk)
             except (ChunkedEncodingError, ContentDecodingError, ConnectionError) as err:
-                log.error("Download of segment {0} failed ({1})".format(sequence.num, err))
+                log.error("Download of segment {0} failed: {1}".format(sequence.num, err))
                 return
 
         log.debug("Download of segment {0} complete".format(sequence.num))
@@ -192,8 +195,8 @@ class HLSStreamWorker(SegmentedStreamWorker):
                       self.duration_offset_start, self.duration_limit,
                       self.playlist_sequence, self.playlist_end))
 
-    def _reload_playlist(self, text, url):
-        return load_hls_playlist(text, url)
+    def _reload_playlist(self, *args, **kwargs):
+        return load_hls_playlist(*args, **kwargs)
 
     def reload_playlist(self):
         if self.closed:
@@ -201,12 +204,15 @@ class HLSStreamWorker(SegmentedStreamWorker):
 
         self.reader.buffer.wait_free()
         log.debug("Reloading playlist")
-        res = self.session.http.get(self.stream.url,
-                                    exception=StreamError,
-                                    retries=self.playlist_reload_retries,
-                                    **self.reader.request_params)
+        res = self.session.http.get(
+            self.stream.url,
+            exception=StreamError,
+            retries=self.playlist_reload_retries,
+            **self.reader.request_params
+        )
+        res.encoding = "utf-8"
         try:
-            playlist = self._reload_playlist(res.text, res.url)
+            playlist = self._reload_playlist(res)
         except ValueError as err:
             raise StreamError(err)
 
@@ -341,6 +347,9 @@ class MuxedHLSStream(MuxedStream):
         self.url_master = url_master
 
     def to_manifest_url(self):
+        if self.url_master is None:
+            return super(MuxedHLSStream, self).to_manifest_url()
+
         return self.url_master
 
 
@@ -359,20 +368,17 @@ class HLSStream(HTTPStream):
     __reader__ = HLSStreamReader
 
     def __init__(self, session_, url, url_master=None, force_restart=False, start_offset=0, duration=None, **args):
-        HTTPStream.__init__(self, session_, url, **args)
+        super(HLSStream, self).__init__(session_, url, **args)
         self.url_master = url_master
         self.force_restart = force_restart
         self.start_offset = start_offset
         self.duration = duration
 
-    def __repr__(self):
-        return "<HLSStream({0!r}, {1!r})>".format(self.url, self.url_master)
-
     def __json__(self):
         json = HTTPStream.__json__(self)
 
         if self.url_master:
-            json["master"] = self.url_master
+            json["master"] = self.to_manifest_url()
 
         # Pretty sure HLS is GET only.
         del json["method"]
@@ -381,7 +387,13 @@ class HLSStream(HTTPStream):
         return json
 
     def to_manifest_url(self):
-        return self.url_master
+        if self.url_master is None:
+            return super(HLSStream, self).to_manifest_url()
+
+        args = self.args.copy()
+        args.update(url=self.url_master)
+
+        return self.session.http.prepare_new_request(**args).url
 
     def open(self):
         reader = self.__reader__(self)
@@ -390,8 +402,8 @@ class HLSStream(HTTPStream):
         return reader
 
     @classmethod
-    def _get_variant_playlist(cls, res):
-        return load_hls_playlist(res.text, base_uri=res.url)
+    def _get_variant_playlist(cls, *args, **kwargs):
+        return load_hls_playlist(*args, **kwargs)
 
     @classmethod
     def parse_variant_playlist(cls, session_, url, name_key="name",
@@ -414,6 +426,7 @@ class HLSStream(HTTPStream):
         audio_select = session_.options.get("hls-audio-select") or []
 
         res = session_.http.get(url, exception=IOError, **request_params)
+        res.encoding = "utf-8"
 
         try:
             parser = cls._get_variant_playlist(res)
