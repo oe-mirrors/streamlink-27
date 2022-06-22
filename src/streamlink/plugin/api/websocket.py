@@ -2,11 +2,8 @@ from __future__ import absolute_import
 
 import json
 import logging
-from threading import RLock, Thread
-try:
-    from typing import Any, Dict, List, Optional, Tuple, Union
-except ImportError:
-    pass
+from threading import RLock, Thread, current_thread
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from websocket import ABNF, STATUS_NORMAL, WebSocketApp, enableTrace
 
@@ -19,8 +16,16 @@ log = logging.getLogger(__name__)
 
 
 class WebsocketClient(Thread):
-    _id = 0
-    # type: int
+    OPCODE_CONT = ABNF.OPCODE_CONT      # type: int
+    OPCODE_TEXT = ABNF.OPCODE_TEXT      # type: int
+    OPCODE_BINARY = ABNF.OPCODE_BINARY  # type: int
+    OPCODE_CLOSE = ABNF.OPCODE_CLOSE    # type: int
+    OPCODE_PING = ABNF.OPCODE_PING      # type: int
+    OPCODE_PONG = ABNF.OPCODE_PONG      # type: int
+
+    _id = 0     # type: int
+
+    ws = None   # type: WebSocketApp
 
     def __init__(
         self,
@@ -145,11 +150,13 @@ class WebsocketClient(Thread):
 
     def close(self, status=STATUS_NORMAL, reason="", timeout=3):
         # type: (int, Union[str, bytes], int) -> None
-        if is_py2:
-            self.ws.close(status=status, reason=bytes(reason), timeout=timeout)
-        else:
-            self.ws.close(status=status, reason=bytes(reason, encoding="utf-8"), timeout=timeout)
-        if self.is_alive():  # pragma: no branch
+        if type(reason) is str:
+            if is_py2:
+                reason = bytes(reason)
+            else:
+                reason = bytes(reason, encoding="utf-8")
+        self.ws.close(status=status, reason=reason, timeout=timeout)
+        if self.is_alive() and current_thread() is not self:
             self.join()
 
     def send(self, data, opcode=ABNF.OPCODE_TEXT):
@@ -180,11 +187,11 @@ class WebsocketClient(Thread):
         log.debug("Closed: {0}".format(wsapp.url))  # pragma: no cover
 
     def on_ping(self, wsapp, data):
-        # type: (WebSocketApp, str) -> None
+        # type: (WebSocketApp, bytes) -> None
         pass  # pragma: no cover
 
     def on_pong(self, wsapp, data):
-        # type: (WebSocketApp, str) -> None
+        # type: (WebSocketApp, bytes) -> None
         pass  # pragma: no cover
 
     def on_message(self, wsapp, data):
@@ -192,9 +199,9 @@ class WebsocketClient(Thread):
         pass  # pragma: no cover
 
     def on_cont_message(self, wsapp, data, cont):
-        # type: (WebSocketApp, str, Any) -> None
+        # type: (WebSocketApp, bytes, Any) -> None
         pass  # pragma: no cover
 
     def on_data(self, wsapp, data, data_type, cont):
-        # type: (WebSocketApp, str, int, Any) -> None
+        # type: (WebSocketApp, Union[bytes, str], int, Any) -> None
         pass  # pragma: no cover
