@@ -1,4 +1,4 @@
-from typing import Any, Callable, FrozenSet, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Callable, FrozenSet, List, Optional, Pattern, Set, Tuple, Type, Union
 
 
 class SchemaContainer(object):
@@ -10,22 +10,37 @@ class SchemaContainer(object):
         self.schema = schema
 
 
-class AllSchema(SchemaContainer):
+class _CollectionSchemaContainer(SchemaContainer):
+    def __init__(self, *schemas):
+        super(_CollectionSchemaContainer, self).__init__(schemas)
+
+
+class AllSchema(_CollectionSchemaContainer):
     """
     Collection of schemas where every schema must be valid.
+    The last validation result gets returned.
     """
 
-    def __init__(self, *schemas):
-        super(AllSchema, self).__init__(schemas)
 
-
-class AnySchema(SchemaContainer):
+class AnySchema(_CollectionSchemaContainer):
     """
     Collection of schemas where at least one schema must be valid.
+    The first successful validation result gets returned.
     """
 
-    def __init__(self, *schemas):
-        super(AnySchema, self).__init__(schemas)
+
+class NoneOrAllSchema(_CollectionSchemaContainer):
+    """
+    Collection of schemas where every schema must be valid. If the initial input is None, all validations will be skipped.
+    The last validation result gets returned.
+    """
+
+
+class ListSchema(_CollectionSchemaContainer):
+    """
+    Collection of schemas where every indexed schema must be valid, as well as the input type and length.
+    A new list of the validated input gets returned.
+    """
 
 
 class GetItemSchema(object):
@@ -47,6 +62,22 @@ class GetItemSchema(object):
         self.item = item
         self.default = default
         self.strict = strict
+
+
+class RegexSchema(object):
+    """
+    A regex pattern that must match using the provided method.
+    """
+
+    def __init__(
+        self,
+        pattern,
+        # TODO: change type from str to Literal["search", "match", "fullmatch", "findall", "split", "sub", "subn"]
+        method="search",
+    ):
+        # type: (Pattern, str)
+        self.pattern = pattern
+        self.method = method
 
 
 class TransformSchema(object):

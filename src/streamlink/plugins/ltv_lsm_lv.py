@@ -58,76 +58,64 @@ class LTVHLSStream(HLSStream):
     r"https://ltv\.lsm\.lv/lv/tiesraide"
 ))
 class LtvLsmLv(Plugin):
-    """
-    Support for Latvian live channels streams on ltv.lsm.lv
-    """
+    URL_IFRAME = "https://ltv.lsm.lv/embed/live?c={embed_id}"
+    URL_API = "https://player.cloudycdn.services/player/ltvlive/channel/{channel_id}/"
 
-    def __init__(self, url):
-        super(LtvLsmLv, self).__init__(url)
-        self._json_data_re = re.compile(r'teliaPlayer\((\{.*?\})\);', re.DOTALL)
+    def _get_streams(self):
+        self.session.http.headers.update({"Referer": self.url})
 
-        self.main_page_schema = validate.Schema(
-            validate.parse_html(),
-            validate.xml_xpath_string(".//iframe[contains(@src, 'ltv.lsm.lv/embed')][1]/@src"),
-            validate.url()
-        )
+        embed_id = self.session.http.get(self.url, schema=validate.Schema(
+            re.compile(r"""embed_id\s*:\s*(?P<q>")(?P<embed_id>\w+)(?P=q)"""),
+            validate.any(None, validate.get("embed_id")),
+        ))
+        if not embed_id:
+            return
+        log.debug("Found embed ID: {0}".format(embed_id))
 
-        self.embed_code_schema = validate.Schema(
+        iframe_url = self.URL_IFRAME.format(embed_id=embed_id)
+        starts_at, channel_id = self.session.http.get(iframe_url, schema=validate.Schema(
             validate.parse_html(),
             validate.xml_xpath_string(".//live[1]/@*[name()=':embed-data']"),
             validate.text,
             validate.parse_json(),
-            {"source": {"embed_code": validate.text}},
-            validate.get(("source", "embed_code")),
-            validate.parse_html(),
-            validate.xml_xpath_string(".//iframe[@src][1]/@src"),
-        )
-
-        self.player_apicall_schema = validate.Schema(
-            validate.transform(self._json_data_re.search),
-            validate.any(
-                None,
-                validate.all(
-                    validate.get(1),
-                    validate.transform(lambda s: s.replace("'", '"')),
-                    validate.transform(lambda s: re.sub(r",\s*\}", "}", s, flags=re.DOTALL)),
-                    validate.parse_json(),
-                    {"channel": validate.text},
-                    validate.get("channel")
-                )
-            )
-        )
-
-        self.sources_schema = validate.Schema(
-            validate.parse_json(),
             {
-                "source": {
-                    "sources": validate.all(
-                        [{"type": validate.text, "src": validate.url()}],
-                        validate.filter(lambda src: src["type"] == "application/x-mpegURL"),
-                        validate.map(lambda src: src.get("src"))
-                    ),
-                }},
-            validate.get(("source", "sources"))
-        )
-
-    def _get_streams(self):
-        api_url = "https://player.cloudycdn.services/player/ltvlive/channel/{channel_id}/"
-
-        self.session.http.headers.update({"Referer": self.url})
-
-        iframe_url = self.session.http.get(self.url, schema=self.main_page_schema)
-        log.debug("Found embed iframe: {0}".format(iframe_url))
-        player_iframe_url = self.session.http.get(iframe_url, schema=self.embed_code_schema)
-        log.debug("Found player iframe: {0}".format(player_iframe_url))
-        channel_id = self.session.http.get(player_iframe_url, schema=self.player_apicall_schema)
+                "parentInfo": {"starts_at": validate.any(None, validate.text)},
+                "source": {"item_id": validate.text},
+            },
+            validate.union_get(
+                ("parentInfo", "starts_at"),
+                ("source", "item_id"),
+            ),
+        ))
+        if channel_id is None:
+            return
         log.debug("Found channel ID: {0}".format(channel_id))
 
-        stream_sources = self.session.http.post(api_url.format(channel_id=channel_id),
-                                                data=dict(refer="ltv.lsm.lv",
-                                                          playertype="regular",
-                                                          protocol="hls"),
-                                                schema=self.sources_schema)
+        if starts_at is not None:
+            log.error("Stream starts at {0}".format(starts_at))
+            return
+
+        stream_sources = self.session.http.post(
+            self.URL_API.format(channel_id=channel_id),
+            data={
+                "refer": "ltv.lsm.lv",
+                "playertype": "regular",
+                "protocol": "hls",
+            },
+            schema=validate.Schema(
+                validate.parse_json(),
+                {
+                    "source": {
+                        "sources": validate.all(
+                            [{"type": validate.text, "src": validate.url()}],
+                            validate.filter(lambda src: src["type"] == "application/x-mpegURL"),
+                            validate.map(lambda src: src.get("src")),
+                        ),
+                    },
+                },
+                validate.get(("source", "sources")),
+            ),
+        )
         for surl in stream_sources:
             for s in LTVHLSStream.parse_variant_playlist(self.session, surl).items():
                 yield s

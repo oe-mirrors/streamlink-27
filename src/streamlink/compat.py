@@ -49,9 +49,11 @@ elif is_py3:
     from textwrap import indent
 
 try:
-    from re import Match
+    from re import Match, Pattern as RE_PATTERN_TYPE
 except ImportError:
-    from typing import Match
+    import re
+    Match = type(re.match("", ""))
+    RE_PATTERN_TYPE = type(re.compile(""))
 
 try:
     from urllib.parse import (
@@ -83,7 +85,9 @@ except ImportError:
 getargspec = getattr(inspect, "getfullargspec", inspect.getargspec)
 
 
-__all__ = ["Callable", "Mapping", "Match", "indent", "is_py2", "is_py3", "is_py33", "is_win32", "str", "bytes",
-           "urlparse", "urlunparse", "urljoin", "parse_qs", "parse_qsl", "quote", "quote_plus",
-           "unquote", "unquote_plus", "queue", "range", "singledispatch", "urlencode", "devnull", "which",
-           "izip", "urlsplit", "urlunsplit", "getargspec", "html_unescape", "lru_cache"]
+__all__ = [
+    "Callable", "Mapping", "Match", "RE_PATTERN_TYPE", "indent", "is_py2", "is_py3", "is_py33", "is_win32", "str", "bytes",
+    "urlparse", "urlunparse", "urljoin", "parse_qs", "parse_qsl", "quote", "quote_plus",
+    "unquote", "unquote_plus", "queue", "range", "singledispatch", "urlencode", "devnull", "which",
+    "izip", "urlsplit", "urlunsplit", "getargspec", "html_unescape", "lru_cache"
+]
