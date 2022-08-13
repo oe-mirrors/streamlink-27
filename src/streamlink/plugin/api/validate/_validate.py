@@ -52,6 +52,8 @@ def validate(schema, value):
 
 @validate.register(type)
 def _validate_type(schema, value):
+    if not is_py2:
+        long = int
     if is_py2 and type(value) == unicode:
         value = str(value)
     if schema == text_type:
