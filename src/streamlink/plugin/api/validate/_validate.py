@@ -58,8 +58,8 @@ def _validate_type(schema, value):
         value = str(value)
     if schema == text_type:
         schema = str
-    elif schema == int and is_py2 and isinstance(value, long):
-        schema = long
+    elif schema == int and is_py2 and isinstance(value, long):  # noqa: 821
+        schema = long  # noqa: 821
     if not isinstance(value, schema):
         raise ValidationError(
             "Type of {value} should be {expected}, but is {actual}",
@@ -147,7 +147,7 @@ def _validate_callable(schema, value):
 @validate.register(RE_PATTERN_TYPE)
 def _validate_pattern(schema, value):
     # type: (RE_PATTERN_TYPE)
-    if not isinstance(value, (str, bytes)):
+    if not isinstance(value, (text_type, bytes)):
         raise ValidationError(
             "Type of {value} should be str or bytes, but is {actual}",
             value=repr(value),
@@ -233,7 +233,7 @@ def _validate_listschema(schema, value):
 @validate.register(RegexSchema)
 def _validate_regexschema(schema, value):
     # type: (RegexSchema)
-    if not isinstance(value, (str, bytes)):
+    if not isinstance(value, (text_type, bytes)):
         raise ValidationError(
             "Type of {value} should be str or bytes, but is {actual}",
             value=repr(value),
