@@ -232,9 +232,9 @@ class Plugin(object):
         self.matches = tuple(m for p, m in matches)
         self.matcher, self.match = next(((p, m) for p, m in matches if m is not None), (None, None))
 
-    def __init__(self, url):
+    def __init__(self, *args, **kwargs):
         # type: (str) -> None
-        self.url = url
+        self.url = args[0]
 
         try:
             self.load_cookies()

@@ -44,8 +44,8 @@ class TwitCasting(Plugin):
         }
     })
 
-    def __init__(self, url):
-        super(TwitCasting, self).__init__(url)
+    def __init__(self, *args, **kwargs):
+        super(TwitCasting, self).__init__(*args, **kwargs)
         self.channel = self.match.group("channel")
 
     def _get_streams(self):

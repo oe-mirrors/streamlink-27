@@ -7,7 +7,7 @@ import pytest
 
 import streamlink.plugins
 import tests.plugins
-from streamlink.compat import is_py2
+from streamlink.compat import _inspect, is_py2
 from streamlink.plugin.plugin import Matcher, Plugin
 from streamlink.utils.module import load_module
 from streamlink_cli.argparser import build_parser
@@ -68,6 +68,19 @@ class TestPlugins:
         classname = plugin.__plugin__.__name__
         assert classname == classname[0].upper() + classname[1:], "__plugin__ class name starts with uppercase letter"
         assert "_" not in classname, "__plugin__ class name does not contain underscores"
+
+    def test_constructor(self, plugin):
+        assert (
+            plugin.__plugin__.__init__ is Plugin.__init__
+            or tuple(
+                (param.name, param.kind)
+                for param in _inspect.signature(plugin.__plugin__.__init__).parameters.values()
+            ) == (
+                ("self", _inspect.Parameter.POSITIONAL_OR_KEYWORD),
+                ("args", _inspect.Parameter.VAR_POSITIONAL),
+                ("kwargs", _inspect.Parameter.VAR_KEYWORD),
+            )
+        )
 
     def test_matchers(self, plugin):
         pluginclass = plugin.__plugin__

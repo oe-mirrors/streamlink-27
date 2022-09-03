@@ -22,6 +22,7 @@ if is_py2:
     _str = str
     str = unicode
     range = xrange
+    import inspect2 as _inspect
     from collections import Mapping
     from itertools import izip
     from singledispatch import singledispatch
@@ -45,6 +46,7 @@ elif is_py3:
     str = str
     range = range
     izip = zip
+    import inspect as _inspect
     from collections.abc import Callable, Mapping
     from functools import singledispatch
     from textwrap import indent
@@ -91,5 +93,5 @@ __all__ = [
     "ABC", "Callable", "Mapping", "Match", "RE_PATTERN_TYPE", "indent", "is_py2", "is_py3", "is_py33", "is_win32", "str",
     "bytes", "urlparse", "urlunparse", "urljoin", "parse_qs", "parse_qsl", "quote", "quote_plus",
     "unquote", "unquote_plus", "queue", "range", "singledispatch", "urlencode", "devnull", "which",
-    "izip", "urlsplit", "urlunsplit", "getargspec", "html_unescape", "lru_cache"
+    "izip", "urlsplit", "urlunsplit", "getargspec", "html_unescape", "lru_cache", "_inspect"
 ]

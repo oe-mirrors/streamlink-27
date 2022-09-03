@@ -164,8 +164,8 @@ class AbemaTV(Plugin):
                                     validate.optional("timeshiftFree"): bool}}}
                                    )
 
-    def __init__(self, url):
-        super(AbemaTV, self).__init__(url)
+    def __init__(self, *args, **kwargs):
+        super(AbemaTV, self).__init__(*args, **kwargs)
         self.session.http.headers.update({'User-Agent': useragents.CHROME})
 
     def _generate_applicationkeysecret(self, deviceid):

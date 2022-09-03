@@ -517,10 +517,10 @@ class Twitch(Plugin):
             return sys.maxsize, stream
         return super(Twitch, cls).stream_weight(stream)
 
-    def __init__(self, url):
-        super(Twitch, self).__init__(url)
+    def __init__(self, *args, **kwargs):
+        super(Twitch, self).__init__(*args, **kwargs)
         match = self.match.groupdict()
-        parsed = urlparse(url)
+        parsed = urlparse(self.url)
         self.params = parse_qsd(parsed.query)
         self.subdomain = match.get("subdomain")
         self.video_id = None

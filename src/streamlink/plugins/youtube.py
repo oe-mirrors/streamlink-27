@@ -76,9 +76,9 @@ class YouTube(Plugin):
         258: 258,
     }
 
-    def __init__(self, url):
-        super(YouTube, self).__init__(url)
-        parsed = urlparse(url)
+    def __init__(self, *args, **kwargs):
+        super(YouTube, self).__init__(*args, **kwargs)
+        parsed = urlparse(self.url)
 
         # translate input URLs to be able to find embedded data and to avoid unnecessary HTTP redirects
         if parsed.netloc == "gaming.youtube.com":
