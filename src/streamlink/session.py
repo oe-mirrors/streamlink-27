@@ -5,10 +5,7 @@ import sys
 import traceback
 from collections import OrderedDict
 from socket import AF_INET, AF_INET6
-try:
-    from typing import Tuple, Type
-except ImportError:
-    pass
+from typing import Iterator, Tuple, Type
 
 import requests
 import requests.packages.urllib3.util.connection as urllib3_connection
@@ -27,6 +24,9 @@ from streamlink.utils.url import update_scheme
 # Ensure that the Logger class returned is Streamslink's for using the API (for backwards compatibility)
 logging.setLoggerClass(StreamlinkLogger)
 log = logging.getLogger(__name__)
+
+# options which support `key1=value1;key2=value2;...` strings as value
+_OPTIONS_HTTP_KEYEQUALSVALUE = {"http-cookies": "cookies", "http-headers": "headers", "http-query-params": "params"}
 
 
 def print_small_exception(start_after):
@@ -47,6 +47,16 @@ def print_small_exception(start_after):
         sys.stderr.write(line)
 
     sys.stderr.write("\n")
+
+
+def _parse_keyvalue_string(value):
+    # type: (str) -> Iterator[Tuple[str, str]]
+    for keyval in value.split(";"):
+        try:
+            key, val = keyval.split("=", 1)
+            yield key.strip(), val.strip()
+        except ValueError:
+            continue
 
 
 class PythonDeprecatedWarning(UserWarning):
@@ -267,21 +277,11 @@ class Streamlink(object):
             if key == "https-proxy":
                 log.info("The https-proxy option has been deprecated in favour of a single http-proxy option")
 
-        elif key == "http-cookies":
-            if isinstance(value, dict):
-                self.http.cookies.update(value)
-            else:
-                self.http.parse_cookies(value)
-        elif key == "http-headers":
-            if isinstance(value, dict):
-                self.http.headers.update(value)
-            else:
-                self.http.parse_headers(value)
-        elif key == "http-query-params":
-            if isinstance(value, dict):
-                self.http.params.update(value)
-            else:
-                self.http.parse_query_params(value)
+        elif key in _OPTIONS_HTTP_KEYEQUALSVALUE:
+            getattr(self.http, _OPTIONS_HTTP_KEYEQUALSVALUE[key]).update(
+                value if isinstance(value, dict) else dict(_parse_keyvalue_string(value))
+            )
+
         elif key == "http-trust-env":
             self.http.trust_env = value
         elif key == "http-ssl-verify":

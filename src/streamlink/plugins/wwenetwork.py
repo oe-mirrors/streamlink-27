@@ -45,8 +45,8 @@ class WWENetwork(Plugin):
 
     customer_id = 16
 
-    def __init__(self, url):
-        super(WWENetwork, self).__init__(url)
+    def __init__(self, *args, **kwargs):
+        super(WWENetwork, self).__init__(*args, **kwargs)
         self.session.http.headers.update({"User-Agent": useragents.CHROME})
         self.auth_token = None
 

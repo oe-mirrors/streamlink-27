@@ -191,10 +191,6 @@ class Plugin(object):
     Use the :func:`pluginargument` decorator to initialize this collection.
     """
 
-    matchers = None  # type: ClassVar[List[Matcher]]
-    # the list of plugin matchers (URL pattern + priority)
-    # use the streamlink.plugin.pluginmatcher decorator for initializing this list
-
     # matches: Sequence[Optional[Match]]
     # a tuple of `re.Match` results of all defined matchers
 
@@ -239,9 +235,9 @@ class Plugin(object):
         self.matches = tuple(m for p, m in matches)
         self.matcher, self.match = next(((p, m) for p, m in matches if m is not None), (None, None))
 
-    def __init__(self, url):
+    def __init__(self, *args, **kwargs):
         # type: (str) -> None
-        self.url = url
+        self.url = args[0]
 
         try:
             self.load_cookies()
@@ -258,7 +254,7 @@ class Plugin(object):
 
     @classmethod
     def get_argument(cls, key):
-        return cls.arguments.get(key)
+        return cls.arguments and cls.arguments.get(key)
 
     @classmethod
     def stream_weight(cls, stream):
@@ -275,24 +271,6 @@ class Plugin(object):
                 stream_types.append(stream_type)
 
         return stream_types
-
-    @classmethod
-    def broken(cls, issue=None):
-        def func(*args, **kwargs):
-            msg = (
-                "This plugin has been marked as broken. This is likely due to "
-                "changes to the service preventing a working implementation. "
-            )
-
-            if issue:
-                msg += "More info: https://github.com/streamlink/streamlink/issues/{0}".format(issue)
-
-            raise PluginError(msg)
-
-        def decorator(*args, **kwargs):
-            return func
-
-        return decorator
 
     def streams(self, stream_types=None, sorting_excludes=None):
         """Attempts to extract available streams.

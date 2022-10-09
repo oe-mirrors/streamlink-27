@@ -3,6 +3,7 @@ import re
 import unittest
 from socket import AF_INET, AF_INET6
 
+import pytest
 import requests_mock
 from requests.packages.urllib3.util.connection import allowed_gai_family
 
@@ -14,6 +15,12 @@ from streamlink.stream.hls import HLSStream
 from streamlink.stream.http import HTTPStream
 from streamlink.stream.rtmpdump import RTMPStream
 from tests.mock import Mock, call, patch
+
+
+@pytest.fixture
+def session():
+    with patch("streamlink.session.Streamlink.load_builtin_plugins"):
+        yield Streamlink()
 
 
 class EmptyPlugin(Plugin):
@@ -389,46 +396,83 @@ class TestSession(unittest.TestCase):
         self.assertEqual(session.get_option("ipv6"), False)
         self.assertEqual(mock_urllib3_connection.allowed_gai_family, allowed_gai_family)
 
-    def test_https_proxy_default(self):
-        session = Streamlink()
+
+class TestSessionOptionHttpProxy:
+    @pytest.fixture
+    def no_deprecation(self, caplog):
+        # type: (pytest.LogCaptureFixture)
+        yield
+        assert not caplog.get_records("call")
+
+    @pytest.fixture
+    def logs_deprecation(self, caplog):
+        # type: (pytest.LogCaptureFixture)
+        yield
+        # TODO: streamlink#4785 not yet implemented
+        # assert [(record.levelname, record.message) for record in caplog.get_records("call")] == [
+        #    ("warning", "The https-proxy option has been deprecated in favor of a single http-proxy option"),
+        # ]
+
+    def test_https_proxy_default(self, session, no_deprecation):
         session.set_option("http-proxy", "http://testproxy.com")
 
-        self.assertEqual("http://testproxy.com", session.http.proxies['http'])
-        self.assertEqual("http://testproxy.com", session.http.proxies['https'])
+        assert session.http.proxies["http"] == "http://testproxy.com"
+        assert session.http.proxies["https"] == "http://testproxy.com"
 
-    def test_https_proxy_set_first(self):
-        session = Streamlink()
+    def test_https_proxy_set_first(self, session, logs_deprecation):
         session.set_option("https-proxy", "https://testhttpsproxy.com")
         session.set_option("http-proxy", "http://testproxy.com")
 
-        self.assertEqual("http://testproxy.com", session.http.proxies['http'])
-        self.assertEqual("http://testproxy.com", session.http.proxies['https'])
+        assert session.http.proxies["http"] == "http://testproxy.com"
+        assert session.http.proxies["https"] == "http://testproxy.com"
 
-    def test_https_proxy_default_override(self):
-        session = Streamlink()
+    def test_https_proxy_default_override(self, session, logs_deprecation):
         session.set_option("http-proxy", "http://testproxy.com")
         session.set_option("https-proxy", "https://testhttpsproxy.com")
 
-        self.assertEqual("https://testhttpsproxy.com", session.http.proxies['http'])
-        self.assertEqual("https://testhttpsproxy.com", session.http.proxies['https'])
+        assert session.http.proxies["http"] == "https://testhttpsproxy.com"
+        assert session.http.proxies["https"] == "https://testhttpsproxy.com"
 
-    def test_https_proxy_set_only(self):
-        session = Streamlink()
+    def test_https_proxy_set_only(self, session, logs_deprecation):
         session.set_option("https-proxy", "https://testhttpsproxy.com")
 
-        self.assertEqual("https://testhttpsproxy.com", session.http.proxies['http'])
-        self.assertEqual("https://testhttpsproxy.com", session.http.proxies['https'])
+        assert session.http.proxies["http"] == "https://testhttpsproxy.com"
+        assert session.http.proxies["https"] == "https://testhttpsproxy.com"
 
-    def test_http_proxy_socks(self):
-        session = self.subject(load_plugins=False)
+    def test_http_proxy_socks(self, session, no_deprecation):
         session.set_option("http-proxy", "socks5://localhost:1234")
 
-        self.assertEqual("socks5://localhost:1234", session.http.proxies["http"])
-        self.assertEqual("socks5://localhost:1234", session.http.proxies["https"])
+        assert session.http.proxies["http"] == "socks5://localhost:1234"
+        assert session.http.proxies["https"] == "socks5://localhost:1234"
 
-    def test_https_proxy_socks(self):
-        session = self.subject(load_plugins=False)
+    def test_https_proxy_socks(self, session, logs_deprecation):
         session.set_option("https-proxy", "socks5://localhost:1234")
 
-        self.assertEqual("socks5://localhost:1234", session.http.proxies["http"])
-        self.assertEqual("socks5://localhost:1234", session.http.proxies["https"])
+        assert session.http.proxies["http"] == "socks5://localhost:1234"
+        assert session.http.proxies["https"] == "socks5://localhost:1234"
+
+
+@pytest.mark.parametrize("option", [
+    pytest.param(("http-cookies", "cookies"), id="http-cookies"),
+    pytest.param(("http-headers", "headers"), id="http-headers"),
+    pytest.param(("http-query-params", "params"), id="http-query-params"),
+], indirect=True)
+class TestOptionsKeyEqualsValue:
+    @pytest.fixture
+    def option(self, request, session):
+        option, attr = request.param
+        httpsessionattr = getattr(session.http, attr)
+        assert session.get_option(option) is httpsessionattr
+        assert "foo" not in httpsessionattr
+        assert "bar" not in httpsessionattr
+        yield option
+        assert httpsessionattr.get("foo") == "foo=bar"
+        assert httpsessionattr.get("bar") == "123"
+
+    def test_dict(self, session, option):
+        # type: (Streamlink, str)
+        session.set_option(option, {"foo": "foo=bar", "bar": "123"})
+
+    def test_string(self, session, option):
+        # type: (Streamlink, str)
+        session.set_option(option, "foo=foo=bar;bar=123;baz")

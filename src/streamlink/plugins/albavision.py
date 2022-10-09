@@ -70,8 +70,8 @@ log = logging.getLogger(__name__)
     (?:/|\#)?$
 """, re.VERBOSE))
 class Albavision(Plugin):
-    def __init__(self, url):
-        super(Albavision, self).__init__(url)
+    def __init__(self, *args, **kwargs):
+        super(Albavision, self).__init__(*args, **kwargs)
         self._page = None
 
     @property
